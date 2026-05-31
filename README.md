@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>To-Do Growth</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+/* ── RESET & BASE ─────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#ff3d57; --yellow:#ffcb00; --green:#00d287; --ink:#181b34;
+  --purple:#a48cff; --blue:#3fa9f5; --orange:#ff7a59;
+  /* dark theme defaults */
+  --bg:#0d0f1e; --panel:#12152a; --card:#181c34; --card2:#1f2440;
+  --border:#2a3052; --text:#eef0fb; --muted:#9aa0c4; --faint:#6c7299;
+  --track:#262c4c; --grid:rgba(255,255,255,.05); --axis:#6c7299;
+  --shadow:0 10px 30px rgba(0,0,0,.45);
+  --radius:18px; --font:'Poppins',system-ui,sans-serif;
+}
+[data-theme="light"]{
+  --bg:#f4f2ed; --panel:#fff; --card:#fff; --card2:#faf9f6;
+  --border:#ebe8e1; --text:#181b34; --muted:#7f7c6f; --faint:#a8a59a;
+  --track:#eeebe3; --grid:rgba(24,27,52,.06); --axis:#a8a59a;
+  --shadow:0 10px 28px rgba(24,27,52,.07);
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:var(--bg);color:var(--text);display:flex;height:100vh;-webkit-font-smoothing:antialiased}
+
+/* ── SCROLLBAR ───────────────────────────────────────────── */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ── SIDEBAR ─────────────────────────────────────────────── */
+#sidebar{width:252px;min-width:252px;height:100vh;display:flex;flex-direction:column;padding:22px 16px;background:var(--panel);border-right:1px solid var(--border);overflow-y:auto}
+.brand{display:flex;align-items:center;gap:12px;padding:2px 6px;margin-bottom:28px}
+.brand-svg{flex-shrink:0}
+.brand-name{font-size:19px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.brand-name span{color:var(--green)}
+.brand-sub{font-size:11px;color:var(--faint);margin-top:2px}
+nav{display:flex;flex-direction:column;gap:4px}
+.nav-btn{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;border:none;background:transparent;color:var(--muted);font-size:13.5px;font-family:var(--font);font-weight:500;cursor:pointer;text-align:left;width:100%;transition:.15s}
+.nav-btn svg{flex-shrink:0;opacity:.8}
+.nav-btn:hover{background:var(--card2);color:var(--text)}
+.nav-btn.active{background:rgba(0,210,135,.15);color:var(--green);font-weight:600}
+.nav-btn.active svg{opacity:1}
+.sidebar-foot{margin-top:auto;padding-top:18px;display:flex;flex-direction:column;gap:10px}
+.score-block{border-radius:14px;padding:14px 16px;border:1px solid}
+.score-block .sb-label{font-size:9.5px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:6px}
+.score-block .sb-val{font-size:32px;font-weight:800;line-height:1}
+.score-block .sb-tag{font-size:12px;font-weight:600;margin-top:4px}
+.theme-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;border-radius:11px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12.5px;font-family:var(--font);cursor:pointer;transition:.15s}
+.theme-btn:hover{background:var(--card2);color:var(--text)}
+
+/* ── MAIN ────────────────────────────────────────────────── */
+#main{flex:1;display:flex;flex-direction:column;min-width:0;height:100vh;overflow:hidden}
+#topbar{padding:17px 30px;border-bottom:1px solid var(--border);background:var(--panel);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.tb-title{font-size:16px;font-weight:700}
+.tb-date{font-size:12.5px;color:var(--faint);margin-top:2px}
+.tb-chip{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;padding:9px 18px;border-radius:22px}
+.tb-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+#content{flex:1;overflow-y:auto;padding:26px 30px}
+
+/* ── VIEWS ───────────────────────────────────────────────── */
+.view{display:none;animation:fadeUp .3s ease}
+.view.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.view-title{margin-bottom:20px}
+.view-title h1{font-size:30px;font-weight:800;letter-spacing:-.03em}
+.view-title p{font-size:13.5px;color:var(--muted);margin-top:4px}
+
+/* ── PANEL ───────────────────────────────────────────────── */
+.panel{border-radius:var(--radius);padding:20px;margin-bottom:16px;background:var(--card);border:1px solid var(--border)}
+.panel-tab{display:inline-flex;align-items:center;gap:8px;font-size:11.5px;font-weight:700;letter-spacing:.5px;padding:8px 16px;border-radius:10px;margin-bottom:18px;color:#fff}
+.panel-tab.yellow{color:var(--ink)}
+.panel-tab-dot{width:7px;height:7px;border-radius:50%}
+.panel-border-green{border-top:3px solid var(--green)}
+.panel-border-yellow{border-top:3px solid var(--yellow)}
+.panel-border-red{border-top:3px solid var(--red)}
+.panel-border-purple{border-top:3px solid var(--purple)}
+
+/* ── PROGRESS BAR ────────────────────────────────────────── */
+.prog-wrap{margin-bottom:16px;background:var(--card);border-radius:14px;padding:16px 20px;border:1px solid var(--border)}
+.prog-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px}
+.prog-label{font-size:13px;color:var(--muted)}
+.prog-pct{font-size:14px;font-weight:700;color:var(--green)}
+.prog-track{height:8px;border-radius:5px;background:var(--track);overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--yellow),var(--green));border-radius:5px;transition:width .5s}
+.week-nav{display:flex;align-items:center;gap:8px;margin-top:14px}
+.week-nav-label{font-size:13px;color:var(--muted);font-weight:600}
+.icon-btn{width:32px;height:32px;border-radius:9px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;font-size:16px}
+.icon-btn:hover:not(:disabled){background:var(--card2);color:var(--text)}
+.icon-btn:disabled{opacity:.35;cursor:default}
+
+/* ── WEEKLY LAYOUT ───────────────────────────────────────── */
+.week-layout{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:16px}
+/* TODAY LIST */
+.today-item{display:flex;align-items:center;gap:11px;padding:13px 15px;border-radius:13px;cursor:pointer;border:1px solid var(--border);background:var(--card2);margin-bottom:8px;transition:all .15s;width:100%}
+.today-item:hover{transform:translateX(2px)}
+.today-item:active{transform:scale(.99)}
+.today-item.done{background:rgba(0,210,135,.12);border-color:rgba(0,210,135,.4)}
+.ti-check{width:22px;height:22px;border-radius:7px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:800;transition:.15s}
+.today-item.done .ti-check{background:var(--green);border-color:var(--green);color:var(--ink)}
+.ti-emoji{font-size:16px}
+.ti-name{font-size:14px;font-weight:500;flex:1;transition:.15s;text-align:left}
+.today-item.done .ti-name{text-decoration:line-through;color:var(--faint)}
+.ti-tag{font-size:11.5px;font-weight:700;color:var(--faint)}
+.today-item.done .ti-tag{color:var(--green)}
+/* GRID MATRIX */
+.gm-wrap{overflow-x:auto}
+.gm-table{border-collapse:separate;border-spacing:5px;min-width:100%}
+.gm-th-corner{width:130px}
+.gm-th-day{font-size:12px;font-weight:600;color:var(--muted);text-align:center;padding:6px 0}
+.gm-th-day.today{color:var(--green)}
+.gm-habit-cell{font-size:13px;font-weight:500;white-space:nowrap;padding-right:8px;color:var(--text)}
+.gm-tile-cell{text-align:center}
+.gm-tile{width:32px;height:32px;border-radius:9px;border:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s;font-size:13px}
+.gm-tile:active{transform:scale(1.12)}
+.gm-tile.future{opacity:.35;cursor:default}
+.gm-tile.inactive{background:transparent;color:var(--faint);font-size:18px;cursor:default}
+.gm-tile.before-start{background:var(--track);opacity:.4;cursor:default}
+.ryg-legend{display:flex;gap:16px;margin-top:16px;font-size:11.5px;color:var(--muted);justify-content:center;flex-wrap:wrap}
+.ryg-legend span{display:flex;align-items:center;gap:6px}
+.ryg-legend i{width:13px;height:13px;border-radius:4px;display:inline-block}
+
+/* ── STAT CARDS ──────────────────────────────────────────── */
+.stat-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+.stat-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+.stat-card{border-radius:16px;padding:17px 19px;border:1px solid var(--border);background:var(--card)}
+.sc-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;font-weight:700;color:var(--muted)}
+.sc-value{font-size:32px;font-weight:800;line-height:1;letter-spacing:-.5px}
+.sc-sub{font-size:11.5px;color:var(--faint);margin-top:7px}
+.hero-card{border-radius:16px;padding:20px;position:relative;overflow:hidden;color:var(--ink)}
+.hero-circle{position:absolute;top:-35px;right:-35px;width:140px;height:140px;border-radius:50%;border:20px solid rgba(255,255,255,.18)}
+.hero-label{font-size:11px;font-weight:700;letter-spacing:.6px;position:relative;text-transform:uppercase}
+.hero-value{font-size:56px;font-weight:800;line-height:1;margin-top:6px;position:relative}
+.hero-badge{display:inline-block;font-size:13px;font-weight:700;background:rgba(24,27,52,.18);padding:5px 14px;border-radius:9px;margin-top:9px;position:relative}
+
+/* ── CALENDAR ────────────────────────────────────────────── */
+.cal-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cal-daynames{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:7px;font-size:10.5px;color:var(--faint);text-align:center}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-cell{aspect-ratio:1;border-radius:10px;display:flex;align-items:flex-start;justify-content:flex-end;padding:5px 7px;transition:transform .12s;cursor:default;position:relative}
+.cal-cell:hover{transform:scale(1.06)}
+.cal-cell-num{font-size:11px;font-weight:700}
+
+/* ── HABIT BARS ──────────────────────────────────────────── */
+.hb-row{display:grid;grid-template-columns:140px 1fr 130px;align-items:center;gap:13px;margin-bottom:13px}
+.hb-label{font-size:13.5px;display:flex;align-items:center;gap:8px;color:var(--text)}
+.hb-track{height:11px;border-radius:6px;background:var(--track);overflow:hidden}
+.hb-bar{height:100%;border-radius:6px;transition:width .6s}
+.hb-meta{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--faint);justify-content:flex-end}
+.hb-meta strong{color:var(--text);font-size:14px}
+
+/* ── MINI MONTHS ─────────────────────────────────────────── */
+.mini-months-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.mini-month-name{font-size:11.5px;font-weight:600;color:var(--muted);margin-bottom:7px}
+.mini-month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.mini-cell{aspect-ratio:1;border-radius:3px}
+
+/* ── STREAK CARDS ────────────────────────────────────────── */
+.streak-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+.streak-card{border-radius:16px;padding:17px 18px;background:var(--card);border:1px solid var(--border)}
+.sk-head{display:flex;align-items:center;gap:10px;margin-bottom:15px}
+.sk-emoji{font-size:19px}
+.sk-name{font-size:14px;font-weight:600}
+.sk-stats{display:flex;justify-content:space-between;text-align:center}
+.sk-num{font-size:20px;font-weight:800}
+.sk-lbl{font-size:9.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--faint);margin-top:3px}
+
+/* ── CANVAS CHARTS ───────────────────────────────────────── */
+.chart-wrap{position:relative}
+canvas{display:block}
+
+/* ── MONTH NAV ───────────────────────────────────────────── */
+.month-nav{display:flex;align-items:center;gap:10px}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.section-head h1{font-size:30px;font-weight:800;letter-spacing:-.03em}
+
+/* ── CONFETTI ────────────────────────────────────────────── */
+.confetti-piece{position:fixed;pointer-events:none;z-index:9999;width:9px;height:9px;border-radius:2px}
+
+/* ── TOOLTIP ─────────────────────────────────────────────── */
+#tooltip{position:fixed;pointer-events:none;z-index:1000;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:9px 13px;font-size:12.5px;font-family:var(--font);color:var(--text);box-shadow:var(--shadow);display:none;line-height:1.6}
+
+/* ── RESPONSIVE ──────────────────────────────────────────── */
+@media(max-width:1100px){.stat-grid-4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){.week-layout{grid-template-columns:1fr}.cal-grid-2{grid-template-columns:1fr}}
+@media(max-width:700px){.mini-months-grid{grid-template-columns:repeat(3,1fr)}.streak-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<!-- TOOLTIP -->
+<div id="tooltip"></div>
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div class="brand">
+    <svg class="brand-svg" width="36" height="36" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="32" width="30" height="30" rx="9" fill="#ff3d57"/>
+      <path d="M13 47.5 L16 50.5 L21.5 44" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="17" y="18" width="30" height="30" rx="9" fill="#ffcb00"/>
+      <path d="M28 33.5 L31 36.5 L36.5 30" stroke="#181b34" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="32" y="4" width="30" height="30" rx="9" fill="#00d287"/>
+      <path d="M43 19.5 L46 22.5 L51.5 16" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div>
+      <div class="brand-name">To-Do <span>Growth</span></div>
+      <div class="brand-sub">Tes habitudes, ton score</div>
+    </div>
+  </div>
+
+  <nav>
+    <button class="nav-btn active" data-view="weekly">
+      <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Vue hebdo
+    </button>
+    <button class="nav-btn" data-view="monthly">
+      <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Rapport mensuel
+    </button>
+    <button class="nav-btn" data-view="annual">
+      <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Vue annuelle
+    </button>
+    <button class="nav-btn" data-view="streaks">
+      <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 2.5.93 4.79 2.46 6.54L12 22l7.54-3.46C21.07 16.79 22 14.5 22 12c0-5.52-4.48-10-10-10z"/><path d="M12 8v4l2 2"/></svg>
+      Séries & records
+    </button>
+  </nav>
+
+  <div class="sidebar-foot">
+    <div class="score-block" id="sidebar-score">
+      <div class="sb-label">Score discipline · ce mois</div>
+      <div class="sb-val" id="sidebar-score-val">—</div>
+      <div class="sb-tag" id="sidebar-score-tag"></div>
+    </div>
+    <button class="theme-btn" id="theme-btn">
+      <svg id="theme-icon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <span id="theme-label">Mode clair</span>
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div id="main">
+  <header id="topbar">
+    <div>
+      <div class="tb-title" id="topbar-title">Vue hebdo</div>
+      <div class="tb-date" id="topbar-date"></div>
+    </div>
+    <div class="tb-chip" id="today-chip" style="background:rgba(0,210,135,.15);color:#00d287">
+      <span class="tb-dot"></span>
+      <span id="today-chip-txt">Aujourd'hui · —%</span>
+    </div>
+  </header>
+
+  <div id="content">
+
+    <!-- ══ VIEW: WEEKLY ══════════════════════════════════════ -->
+    <div class="view active" id="view-weekly">
+      <div class="view-title">
+        <h1>Vue hebdo</h1>
+        <p id="week-subtitle"></p>
+      </div>
+
+      <div class="prog-wrap">
+        <div class="prog-head">
+          <span class="prog-label">Complétion de la semaine</span>
+          <span class="prog-pct" id="week-pct-label">0% · 0/0</span>
+        </div>
+        <div class="prog-track"><div class="prog-fill" id="week-prog" style="width:0%"></div></div>
+        <div class="week-nav">
+          <button class="icon-btn" id="week-prev">&#8249;</button>
+          <button class="icon-btn" id="week-next" disabled>&#8250;</button>
+        </div>
+      </div>
+
+      <div class="week-layout">
+        <!-- Today list -->
+        <div class="panel panel-border-green">
+          <div class="panel-tab" style="background:#00d287"><span class="panel-tab-dot" style="background:rgba(255,255,255,.5)"></span>HABITUDES DU JOUR</div>
+          <div id="today-list"></div>
+        </div>
+        <!-- Week grid -->
+        <div class="panel panel-border-yellow">
+          <div class="panel-tab yellow" style="background:#ffcb00"><span class="panel-tab-dot" style="background:rgba(24,27,52,.3)"></span>GRILLE DE LA SEMAINE</div>
+          <div class="gm-wrap"><table class="gm-table" id="week-grid"></table></div>
+          <div class="ryg-legend">
+            <span><i style="background:#00d287"></i>Réussi</span>
+            <span><i style="background:#ff3d57"></i>Manqué</span>
+            <span><i style="background:var(--track)"></i>À venir</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ VIEW: MONTHLY ═════════════════════════════════════ -->
+    <div class="view" id="view-monthly">
+      <div class="section-head">
+        <h1 id="month-title">Mai 2026</h1>
+        <div class="month-nav">
+          <button class="icon-btn" id="month-prev">&#8249;</button>
+          <button class="icon-btn" id="month-next" disabled>&#8250;</button>
+        </div>
+      </div>
+
+      <div class="stat-grid-4" id="month-stat-cards"></div>
+
+      <div class="cal-grid-2">
+        <div class="panel panel-border-green">
+          <div class="panel-tab" style="background:#00d287"><span class="panel-tab-dot" style="background:rgba(255,255,255,.5)"></span>ÉVOLUTION QUOTIDIENNE</div>
+          <div class="chart-wrap" style="height:210px"><canvas id="chart-daily"></canvas></div>
+        </div>
+        <div class="panel panel-border-yellow">
+          <div class="panel-tab yellow" style="background:#ffcb00"><span class="panel-tab-dot" style="background:rgba(24,27,52,.3)"></span>CALENDRIER DU MOIS</div>
+          <div class="cal-daynames"><span>Lun</span><span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span></div>
+          <div class="cal-grid" id="cal-grid"></div>
+          <div class="ryg-legend" style="margin-top:14px">
+            <span><i style="background:#ff3d57"></i>Manqué</span>
+            <span><i style="background:#ffcb00"></i>En cours</span>
+            <span><i style="background:#00d287"></i>Réussi</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-border-red">
+        <div class="panel-tab" style="background:#ff3d57"><span class="panel-tab-dot" style="background:rgba(255,255,255,.5)"></span>PERFORMANCE PAR HABITUDE</div>
+        <div id="habit-bars"></div>
+      </div>
+    </div>
+
+    <!-- ══ VIEW: ANNUAL ══════════════════════════════════════ -->
+    <div class="view" id="view-annual">
+      <div class="section-head">
+        <h1 id="year-title">2026</h1>
+        <div class="month-nav">
+          <button class="icon-btn" id="year-prev">&#8249;</button>
+          <span style="font-size:14px;font-weight:600;color:var(--muted);min-width:50px;text-align:center" id="year-label">2026</span>
+          <button class="icon-btn" id="year-next" disabled>&#8250;</button>
+        </div>
+      </div>
+
+      <div class="stat-grid-4" id="annual-stat-cards"></div>
+
+      <div class="panel panel-border-green">
+        <div class="panel-tab" style="background:#00d287"><span class="panel-tab-dot" style="background:rgba(255,255,255,.5)"></span>SCORE DE DISCIPLINE PAR MOIS</div>
+        <div class="chart-wrap" style="height:220px"><canvas id="chart-annual"></canvas></div>
+      </div>
+
+      <div class="panel panel-border-yellow">
+        <div class="panel-tab yellow" style="background:#ffcb00"><span class="panel-tab-dot" style="background:rgba(24,27,52,.3)"></span>APERÇU DES 12 MOIS</div>
+        <div class="mini-months-grid" id="mini-months"></div>
+      </div>
+    </div>
+
+    <!-- ══ VIEW: STREAKS ═════════════════════════════════════ -->
+    <div class="view" id="view-streaks">
+      <div class="section-head"><h1>Séries & records</h1></div>
+      <div class="stat-grid-3" id="streak-global-cards"></div>
+      <div class="streak-grid" id="streak-habit-cards"></div>
+      <div class="panel panel-border-green">
+        <div class="panel-tab" style="background:#00d287"><span class="panel-tab-dot" style="background:rgba(255,255,255,.5)"></span>SÉRIE EN COURS VS RECORD</div>
+        <div class="chart-wrap" style="height:230px"><canvas id="chart-streaks"></canvas></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+/* ============================================================
+   CONSTANTS & HELPERS
+   ============================================================ */
+const C = { red:'#ff3d57', yellow:'#ffcb00', green:'#00d287', ink:'#181b34', purple:'#a48cff', blue:'#3fa9f5' };
+const TRACKING_START = new Date('2026-05-17T00:00:00');
+const STORAGE_KEY = 'todogrowth_v1';
+
+const HABITS = [
+  { id:'water',   name:"1L d'eau",  emoji:'💧', color:C.blue,   days:[0,1,2,3,4,5,6] },
+  { id:'italian', name:'Italien',   emoji:'🇮🇹', color:C.green,  days:[0,1,2,3,4,5,6] },
+  { id:'news',    name:'Actualité', emoji:'📰', color:C.yellow, days:[0,2,4,6] },
+  { id:'sport',   name:'Sport',     emoji:'🏃', color:C.red,    days:[1,2,6] },
+  { id:'reading', name:'Lecture',   emoji:'📚', color:C.purple, days:[0,1,2,3,6] },
+  { id:'projet',  name:'Projet',    emoji:'🚀', color:'#ff7a59', days:[0,1,2,3,6] },
+];
+
+const DAY_SHORT = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+const DAY_NAMES = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+const MONTH_NAMES = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+const MONTH_SHORT = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+
+const fmtISO = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const dayIdx = d => { const g=d.getDay(); return g===0?6:g-1; };
+const addDays = (d,n) => { const x=new Date(d); x.setDate(x.getDate()+n); x.setHours(0,0,0,0); return x; };
+const mondayOf = d => addDays(d, -dayIdx(d));
+const sameDay = (a,b) => fmtISO(a)===fmtISO(b);
+const today = () => { const d=new Date(); d.setHours(0,0,0,0); return d; };
+const beforeStart = d => d < TRACKING_START;
+const clamp = (v,lo,hi) => Math.max(lo,Math.min(hi,v));
+const lerp = (a,b,t) => Math.round(a+(b-a)*t);
+
+// RED → YELLOW → GREEN interpolation
+function rygColor(pct) {
+  if (pct === null) return null;
+  let r,g,b;
+  if (pct <= 50) { const t=pct/50; r=lerp(255,255,t); g=lerp(61,203,t); b=lerp(87,0,t); }
+  else           { const t=(pct-50)/50; r=lerp(255,0,t); g=lerp(203,210,t); b=lerp(0,135,t); }
+  return `rgb(${r},${g},${b})`;
+}
+
+function scoreLabel(s) {
+  if (s>=90) return { label:'Élite', color:C.purple };
+  if (s>=75) return { label:'Excellent', color:C.green };
+  if (s>=60) return { label:'Bien', color:C.blue };
+  if (s>=40) return { label:'Moyen', color:C.yellow };
+  return { label:'À améliorer', color:C.red };
+}
+
+/* ============================================================
+   DEMO DATA (seeded, 17 May → today)
+   ============================================================ */
+function mulberry32(a){return function(){a|=0;a=(a+0x6d2b79f5)|0;let t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};}
+const RATE = { water:.92, italian:.84, news:.74, sport:.60, reading:.70, projet:.50 };
+
+function buildDemo() {
+  const rng = mulberry32(20260517);
+  const T = today();
+  const completions = {};
+  let d = new Date(TRACKING_START);
+  while (d <= T) {
+    const di = dayIdx(d), isToday = sameDay(d,T), done = [];
+    for (const h of HABITS) {
+      if (!h.days.includes(di)) continue;
+      if (isToday) { if (rng() < RATE[h.id]*.5) done.push(h.id); }
+      else if (rng() < RATE[h.id]) done.push(h.id);
+    }
+    if (done.length) completions[fmtISO(d)] = done;
+    d = addDays(d,1);
+  }
+  return { completions, meta:{ createdAt:fmtISO(TRACKING_START), lastSeen:fmtISO(T) } };
+}
+
+/* ============================================================
+   STORAGE
+   ============================================================ */
+let APP = null;
+let saveTimer = null;
+
+function loadData() {
+  try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch(e){}
+  return buildDemo();
+}
+function saveData() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    APP.meta.lastSeen = fmtISO(today());
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(APP)); } catch(e){}
+  }, 300);
+}
+
+/* ============================================================
+   STATS ENGINE
+   ============================================================ */
+function expectedOn(date) { return HABITS.filter(h => h.days.includes(dayIdx(date))); }
+
+function rangeStats(from, to) {
+  let completed=0, expected=0;
+  const start = from < TRACKING_START ? new Date(TRACKING_START) : new Date(from);
+  let d = new Date(start);
+  while (d <= to) {
+    const di = dayIdx(d), done = APP.completions[fmtISO(d)] || [];
+    for (const h of HABITS) if (h.days.includes(di)) { expected++; if (done.includes(h.id)) completed++; }
+    d = addDays(d,1);
+  }
+  return { completed, expected, pct: expected ? Math.round((completed/expected)*100) : 0 };
+}
+
+function dayPct(date) {
+  if (beforeStart(date)) return null;
+  const di=dayIdx(date), done=APP.completions[fmtISO(date)]||[]; let c=0,e=0;
+  for (const h of HABITS) if (h.days.includes(di)) { e++; if (done.includes(h.id)) c++; }
+  return e ? Math.round((c/e)*100) : null;
+}
+
+function habitMonthStats(habit, year, month) {
+  const lastDay = new Date(year,month+1,0).getDate(); let done=0,expected=0;
+  for (let d=1; d<=lastDay; d++) {
+    const dt = new Date(year,month,d);
+    if (beforeStart(dt) || !habit.days.includes(dayIdx(dt))) continue;
+    expected++; if ((APP.completions[fmtISO(dt)]||[]).includes(habit.id)) done++;
+  }
+  return { done, expected, pct: expected ? Math.round((done/expected)*100) : 0 };
+}
+
+function currentStreak(habit) {
+  let streak=0, d=new Date(today()), guard=0;
+  while (guard++<500 && d>=TRACKING_START) {
+    if (habit.days.includes(dayIdx(d))) {
+      const done=(APP.completions[fmtISO(d)]||[]).includes(habit.id), isT=sameDay(d,today());
+      if (done) streak++; else if (!isT) break;
+    }
+    d = addDays(d,-1);
+  }
+  return streak;
+}
+
+function bestStreak(habit) {
+  let best=0, run=0, d=new Date(TRACKING_START);
+  while (d<=today()) {
+    if (habit.days.includes(dayIdx(d))) {
+      if ((APP.completions[fmtISO(d)]||[]).includes(habit.id)) { run++; best=Math.max(best,run); } else run=0;
+    }
+    d=addDays(d,1);
+  }
+  return best;
+}
+
+/* ============================================================
+   CONFETTI
+   ============================================================ */
+function burst() {
+  const cols=[C.red,C.yellow,C.green,C.purple,C.blue,'#ff7a59'];
+  for (let i=0;i<40;i++) {
+    const p=document.createElement('div'); p.className='confetti-piece';
+    p.style.background=cols[i%cols.length]; p.style.left='50vw'; p.style.top='40vh';
+    document.body.appendChild(p);
+    const a=Math.random()*Math.PI*2, dist=140+Math.random()*200;
+    p.animate([
+      {transform:'translate(-50%,-50%) rotate(0)', opacity:1},
+      {transform:`translate(${Math.cos(a)*dist-50}%,${Math.sin(a)*dist-50+140}%) rotate(${Math.random()*720}deg)`, opacity:0}
+    ],{duration:1000+Math.random()*500,easing:'cubic-bezier(.2,.7,.3,1)'}).onfinish=()=>p.remove();
+  }
+}
+
+/* ============================================================
+   TOOLTIP
+   ============================================================ */
+const TT = document.getElementById('tooltip');
+function showTip(e, html) { TT.innerHTML=html; TT.style.display='block'; moveTip(e); }
+function moveTip(e) { TT.style.left=Math.min(e.clientX+12, window.innerWidth-TT.offsetWidth-8)+'px'; TT.style.top=Math.min(e.clientY+12, window.innerHeight-TT.offsetHeight-8)+'px'; }
+function hideTip() { TT.style.display='none'; }
+document.addEventListener('mousemove', e=>{ if(TT.style.display!=='none') moveTip(e); });
+
+/* ============================================================
+   CANVAS CHART HELPERS
+   ============================================================ */
+function getThemeColors() {
+  const cs = getComputedStyle(document.documentElement);
+  return {
+    grid: cs.getPropertyValue('--grid').trim(),
+    axis: cs.getPropertyValue('--axis').trim(),
+    card2: cs.getPropertyValue('--card2').trim(),
+    text: cs.getPropertyValue('--text').trim(),
+  };
+}
+
+function drawLineChart(canvasId, labels, datasets, yMax=100) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.parentElement.offsetWidth;
+  const H = canvas.parentElement.offsetHeight;
+  canvas.width = W * devicePixelRatio;
+  canvas.height = H * devicePixelRatio;
+  canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+
+  const tc = getThemeColors();
+  const pad = { t:12, r:12, b:32, l:36 };
+  const cw = W - pad.l - pad.r;
+  const ch = H - pad.t - pad.b;
+
+  ctx.clearRect(0,0,W,H);
+
+  // grid
+  const yTicks = [0,25,50,75,100];
+  ctx.strokeStyle = tc.grid; ctx.lineWidth = 1;
+  for (const y of yTicks) {
+    const py = pad.t + ch - (y/yMax)*ch;
+    ctx.beginPath(); ctx.moveTo(pad.l, py); ctx.lineTo(pad.l+cw, py); ctx.stroke();
+    ctx.fillStyle = tc.axis; ctx.font = `10px Poppins,sans-serif`;
+    ctx.textAlign = 'right'; ctx.fillText(y, pad.l-5, py+4);
+  }
+
+  for (const ds of datasets) {
+    const pts = ds.data.map((v,i) => ({
+      x: pad.l + (labels.length > 1 ? (i/(labels.length-1))*cw : cw/2),
+      y: v === null ? null : pad.t + ch - clamp(v,0,yMax)/yMax*ch
+    }));
+
+    // fill
+    if (ds.fill) {
+      const validPts = pts.filter(p=>p.y!==null);
+      if (validPts.length > 1) {
+        const grad = ctx.createLinearGradient(0,pad.t,0,pad.t+ch);
+        grad.addColorStop(0, ds.fill + '60');
+        grad.addColorStop(1, ds.fill + '05');
+        ctx.beginPath();
+        let started = false;
+        for (const p of pts) {
+          if (p.y===null) continue;
+          if (!started) { ctx.moveTo(p.x, p.y); started=true; } else ctx.lineTo(p.x, p.y);
+        }
+        const lastV = pts.filter(p=>p.y!==null).at(-1);
+        const firstV = pts.filter(p=>p.y!==null)[0];
+        ctx.lineTo(lastV.x, pad.t+ch); ctx.lineTo(firstV.x, pad.t+ch);
+        ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
+      }
+    }
+
+    // line
+    ctx.strokeStyle = ds.color; ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    ctx.beginPath(); let started=false;
+    for (const p of pts) {
+      if (p.y===null) { started=false; continue; }
+      if (!started) { ctx.moveTo(p.x,p.y); started=true; } else ctx.lineTo(p.x,p.y);
+    }
+    ctx.stroke();
+
+    // dots
+    for (const p of pts) {
+      if (p.y===null) continue;
+      ctx.beginPath(); ctx.arc(p.x,p.y,3.5,0,Math.PI*2);
+      ctx.fillStyle=ds.color; ctx.fill();
+    }
+  }
+
+  // x labels
+  ctx.fillStyle = tc.axis; ctx.font = '10px Poppins,sans-serif'; ctx.textAlign='center';
+  const step = labels.length <= 12 ? 1 : Math.ceil(labels.length/10);
+  for (let i=0;i<labels.length;i+=step) {
+    const x = pad.l + (labels.length>1 ? (i/(labels.length-1))*cw : cw/2);
+    ctx.fillText(labels[i], x, H-pad.b+16);
+  }
+}
+
+function drawBarChart(canvasId, labels, datasets, horizontal=false) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.parentElement.offsetWidth;
+  const H = canvas.parentElement.offsetHeight;
+  canvas.width = W*devicePixelRatio; canvas.height = H*devicePixelRatio;
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+  const tc = getThemeColors();
+  ctx.clearRect(0,0,W,H);
+
+  const pad = { t:12, r:12, b:36, l:38 };
+  const cw = W-pad.l-pad.r, ch = H-pad.t-pad.b;
+  const nGroups = labels.length, nBars = datasets.length;
+  const groupW = cw/nGroups;
+  const barW = Math.min((groupW*0.7)/nBars, 32);
+  const maxVal = Math.max(...datasets.flatMap(d=>d.data.filter(v=>v!==null)));
+  const yMax = Math.ceil(maxVal/5)*5 || 10;
+
+  // grid
+  ctx.strokeStyle=tc.grid; ctx.lineWidth=1;
+  for (let t=0; t<=4; t++) {
+    const val = (t/4)*yMax;
+    const py = pad.t + ch - (val/yMax)*ch;
+    ctx.beginPath(); ctx.moveTo(pad.l,py); ctx.lineTo(pad.l+cw,py); ctx.stroke();
+    ctx.fillStyle=tc.axis; ctx.font='10px Poppins,sans-serif'; ctx.textAlign='right';
+    ctx.fillText(Math.round(val), pad.l-5, py+4);
+  }
+
+  // bars
+  for (let gi=0; gi<nGroups; gi++) {
+    const cx = pad.l + gi*groupW + groupW/2;
+    const totalW = nBars*barW + (nBars-1)*4;
+    for (let bi=0; bi<nBars; bi++) {
+      const v = datasets[bi].data[gi];
+      if (v===null) continue;
+      const bh = (v/yMax)*ch;
+      const bx = cx - totalW/2 + bi*(barW+4);
+      const by = pad.t+ch-bh;
+      const r = Math.min(5, barW/2);
+      ctx.fillStyle = datasets[bi].color;
+      ctx.beginPath();
+      ctx.moveTo(bx+r,by); ctx.lineTo(bx+barW-r,by);
+      ctx.quadraticCurveTo(bx+barW,by,bx+barW,by+r);
+      ctx.lineTo(bx+barW,by+bh); ctx.lineTo(bx,by+bh); ctx.lineTo(bx,by+r);
+      ctx.quadraticCurveTo(bx,by,bx+r,by);
+      ctx.closePath(); ctx.fill();
+    }
+    // x label
+    ctx.fillStyle=tc.axis; ctx.font='13px Poppins,sans-serif'; ctx.textAlign='center';
+    ctx.fillText(labels[gi], cx, H-pad.b+16);
+  }
+}
+
+/* ============================================================
+   VIEW STATE
+   ============================================================ */
+let currentView = 'weekly';
+let weekOffset = 0;
+let monthState = { y: today().getFullYear(), m: today().getMonth() };
+let yearState = today().getFullYear();
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const v = btn.dataset.view;
+    currentView = v;
+    document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+    document.getElementById('view-'+v).classList.add('active');
+    document.getElementById('topbar-title').textContent = btn.textContent.trim();
+    renderCurrentView();
+  });
+});
+
+/* ============================================================
+   TOPBAR DATE + CHIP
+   ============================================================ */
+function updateTopbar() {
+  const T = today();
+  document.getElementById('topbar-date').textContent =
+    DAY_NAMES[dayIdx(T)] + ' ' + T.getDate() + ' ' + MONTH_NAMES[T.getMonth()] + ' ' + T.getFullYear();
+  const s = rangeStats(T, T);
+  const chip = document.getElementById('today-chip-txt');
+  chip.textContent = `Aujourd'hui · ${s.pct}%`;
+}
+
+/* ============================================================
+   SIDEBAR SCORE
+   ============================================================ */
+function updateSidebarScore() {
+  const T = today();
+  const first = new Date(T.getFullYear(), T.getMonth(), 1);
+  const s = rangeStats(first, T);
+  const sl = scoreLabel(s.pct);
+  const block = document.getElementById('sidebar-score');
+  block.style.borderColor = sl.color + '44';
+  block.style.background = sl.color + '1a';
+  document.getElementById('sidebar-score-val').textContent = s.pct;
+  document.getElementById('sidebar-score-val').style.color = sl.color;
+  document.getElementById('sidebar-score-tag').textContent = '✦ ' + sl.label;
+  document.getElementById('sidebar-score-tag').style.color = sl.color;
+}
+
+/* ============================================================
+   WEEKLY VIEW
+   ============================================================ */
+function renderWeekly() {
+  const T = today();
+  const monday = addDays(mondayOf(T), weekOffset*7);
+  const days = Array.from({length:7}, (_,i) => addDays(monday,i));
+  const weekStats = rangeStats(days[0], days[6]);
+
+  // subtitle
+  const lbl = weekOffset===0 ? `Semaine du ${days[0].getDate()} au ${days[6].getDate()} ${MONTH_SHORT[days[6].getMonth()]} ${days[6].getFullYear()}`
+    : `${days[0].getDate()} ${MONTH_SHORT[days[0].getMonth()]} – ${days[6].getDate()} ${MONTH_SHORT[days[6].getMonth()]}`;
+  document.getElementById('week-subtitle').textContent = lbl;
+
+  // progress
+  document.getElementById('week-pct-label').textContent = `${weekStats.pct}% · ${weekStats.completed}/${weekStats.expected}`;
+  document.getElementById('week-prog').style.width = weekStats.pct + '%';
+  document.getElementById('week-next').disabled = weekOffset >= 0;
+
+  // TODAY LIST
+  const isCurrentWeek = weekOffset === 0;
+  const refDay = isCurrentWeek ? T : days[0]; // show monday's habits if past week
+  const displayDay = isCurrentWeek ? T : days.find(d=>!beforeStart(d)&&d<=T) || T;
+  const todayHabits = expectedOn(displayDay);
+  const todayDone = APP.completions[fmtISO(displayDay)] || [];
+
+  const list = document.getElementById('today-list');
+  list.innerHTML = '';
+  for (const h of todayHabits) {
+    const done = todayDone.includes(h.id);
+    const btn = document.createElement('button');
+    btn.className = 'today-item' + (done?' done':'');
+    btn.style.width = '100%';
+    btn.innerHTML = `
+      <span class="ti-check">${done?'✓':''}</span>
+      <span class="ti-emoji">${h.emoji}</span>
+      <span class="ti-name">${h.name}</span>
+      <span class="ti-tag">${done?'Fait':'À faire'}</span>`;
+    const isFuture = displayDay > T;
+    btn.disabled = isFuture;
+    if (!isFuture) {
+      btn.addEventListener('click', () => toggleHabit(fmtISO(displayDay), h.id));
+    }
+    list.appendChild(btn);
+  }
+
+  // WEEK GRID
+  const table = document.getElementById('week-grid');
+  let html = '<thead><tr><th class="gm-th-corner"></th>';
+  days.forEach((d,i) => {
+    const isToday = sameDay(d,T);
+    html += `<th class="gm-th-day${isToday?' today':''}">${DAY_SHORT[i]}<br><span style="font-size:10px;opacity:.7">${d.getDate()}</span></th>`;
+  });
+  html += '</tr></thead><tbody>';
+  for (const h of HABITS) {
+    html += `<tr><td class="gm-habit-cell">${h.emoji} ${h.name}</td>`;
+    for (const d of days) {
+      const sched = h.days.includes(dayIdx(d));
+      const isFuture = d > T, isBefore = beforeStart(d);
+      const done = (APP.completions[fmtISO(d)]||[]).includes(h.id);
+      if (!sched) {
+        html += `<td class="gm-tile-cell"><button class="gm-tile inactive" disabled>·</button></td>`;
+      } else if (isBefore) {
+        html += `<td class="gm-tile-cell"><button class="gm-tile before-start" disabled style="background:var(--track)"></button></td>`;
+      } else {
+        const bg = done ? C.green : (isFuture ? 'var(--track)' : C.red);
+        const check = done ? `<svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7.5L6 10.5L11.5 4" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>` : '';
+        const cls = 'gm-tile' + (isFuture?' future':'');
+        html += `<td class="gm-tile-cell"><button class="${cls}" style="background:${bg};${isFuture?'cursor:default':''}" data-iso="${fmtISO(d)}" data-hid="${h.id}">${check}</button></td>`;
+      }
+    }
+    html += '</tr>';
+  }
+  html += '</tbody>';
+  table.innerHTML = html;
+  table.querySelectorAll('.gm-tile:not(.inactive):not(.future):not(.before-start)').forEach(btn => {
+    btn.addEventListener('click', () => toggleHabit(btn.dataset.iso, btn.dataset.hid));
+  });
+}
+
+/* ============================================================
+   MONTHLY VIEW
+   ============================================================ */
+function renderMonthly() {
+  const { y, m } = monthState;
+  const T = today();
+  const first = new Date(y, m, 1);
+  const lastDay = new Date(y, m+1, 0).getDate();
+  const lastDate = new Date(y, m, lastDay);
+  const stats = rangeStats(first, lastDate > T ? T : lastDate);
+  const sl = scoreLabel(stats.pct);
+  const isCurrent = y===T.getFullYear() && m===T.getMonth();
+
+  document.getElementById('month-title').textContent = MONTH_NAMES[m] + ' ' + y;
+  document.getElementById('month-next').disabled = isCurrent;
+
+  // STAT CARDS
+  const sc = document.getElementById('month-stat-cards');
+  const heroGrad = `linear-gradient(135deg, ${C.yellow}, ${rygColor(stats.pct)})`;
+  sc.innerHTML = `
+    <div class="hero-card" style="background:${heroGrad}">
+      <div class="hero-circle"></div>
+      <div class="hero-label">Score discipline</div>
+      <div class="hero-value">${stats.pct}</div>
+      <div class="hero-badge">${sl.label}</div>
+    </div>
+    <div class="stat-card" style="border-top:3px solid ${C.green}">
+      <div class="sc-label">Réalisées</div>
+      <div class="sc-value" style="color:${C.green}">${stats.completed}</div>
+      <div class="sc-sub">sur ${stats.expected} attendues</div>
+    </div>
+    <div class="stat-card" style="border-top:3px solid ${C.yellow}">
+      <div class="sc-label">Attendues</div>
+      <div class="sc-value" style="color:${C.yellow}">${stats.expected}</div>
+      <div class="sc-sub">ce mois-ci</div>
+    </div>
+    <div class="stat-card" style="border-top:3px solid ${C.green}">
+      <div class="sc-label">Taux</div>
+      <div class="sc-value" style="color:${C.green}">${stats.pct}%</div>
+      <div class="sc-sub">de complétion</div>
+    </div>`;
+
+  // DAILY CHART
+  const dailyLabels = [], dailyData = [];
+  for (let d=1; d<=lastDay; d++) {
+    dailyLabels.push(d);
+    const dt = new Date(y,m,d);
+    dailyData.push(dt > T ? null : dayPct(dt));
+  }
+  requestAnimationFrame(() => {
+    drawLineChart('chart-daily', dailyLabels, [{ data:dailyData, color:C.green, fill:C.green }]);
+  });
+
+  // CALENDAR
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+  const leadPad = dayIdx(first);
+  for (let i=0; i<leadPad; i++) { const e=document.createElement('div'); grid.appendChild(e); }
+  for (let d=1; d<=lastDay; d++) {
+    const dt = new Date(y,m,d);
+    const isFuture = dt > T, isBefore = beforeStart(dt);
+    const pct = (isFuture || isBefore) ? null : dayPct(dt);
+    const bg = (isFuture || isBefore) ? 'var(--track)' : (rygColor(pct) || 'var(--track)');
+    const textColor = pct===null ? 'var(--faint)' : (pct>50?'#fff':C.ink);
+    const cell = document.createElement('div');
+    cell.className = 'cal-cell';
+    cell.style.background = bg;
+    cell.style.opacity = (isFuture || isBefore) ? '.4' : '1';
+    cell.innerHTML = `<span class="cal-cell-num" style="color:${textColor}">${d}</span>`;
+    if (!isFuture && !isBefore) {
+      cell.addEventListener('mouseenter', e => showTip(e, `<strong>${d} ${MONTH_SHORT[m]}</strong><br>Complétion : ${pct}%`));
+      cell.addEventListener('mouseleave', hideTip);
+    }
+    grid.appendChild(cell);
+  }
+
+  // HABIT BARS
+  const hbContainer = document.getElementById('habit-bars');
+  const perHabit = HABITS.map(h => ({ h, ...habitMonthStats(h,y,m), streak:currentStreak(h) })).sort((a,b)=>b.pct-a.pct);
+  hbContainer.innerHTML = perHabit.map(({h,done,expected,pct,streak}) => `
+    <div class="hb-row">
+      <div class="hb-label"><span>${h.emoji}</span> ${h.name}</div>
+      <div class="hb-track"><div class="hb-bar" style="width:${pct}%;background:${rygColor(pct)||'var(--track)'}"></div></div>
+      <div class="hb-meta"><strong>${pct}%</strong> <span>${done}/${expected}</span> <span style="color:${C.red}">🔥${streak}</span></div>
+    </div>`).join('');
+}
+
+/* ============================================================
+   ANNUAL VIEW
+   ============================================================ */
+function renderAnnual() {
+  const T = today();
+  document.getElementById('year-label').textContent = yearState;
+  document.getElementById('year-title').textContent = 'Bilan ' + yearState;
+  document.getElementById('year-next').disabled = yearState >= T.getFullYear();
+
+  const monthly = Array.from({length:12}, (_,m) => {
+    const first = new Date(yearState,m,1), last = new Date(yearState,m+1,0);
+    const to = last > T ? T : last;
+    if (first > T || last < TRACKING_START) return { m, pct:null };
+    return { m, pct: rangeStats(first,to).pct };
+  });
+  const valid = monthly.filter(x=>x.pct!==null&&x.pct>=0);
+  const best = valid.length ? valid.reduce((a,b)=>b.pct>a.pct?b:a) : null;
+  const avg = valid.length ? Math.round(valid.reduce((s,x)=>s+x.pct,0)/valid.length) : 0;
+  const habitYear = HABITS.map(h => { let d=0,e=0; for(let m=0;m<12;m++){const s=habitMonthStats(h,yearState,m);d+=s.done;e+=s.expected;} return{h,pct:e?Math.round((d/e)*100):0}; });
+  const bh = habitYear.reduce((a,b)=>b.pct>a.pct?b:a);
+  const wh = habitYear.reduce((a,b)=>b.pct<a.pct?b:a);
+
+  // STAT CARDS
+  document.getElementById('annual-stat-cards').innerHTML = `
+    <div class="stat-card" style="border-top:3px solid ${C.purple}">
+      <div class="sc-label">Meilleur mois</div>
+      <div class="sc-value" style="color:${C.purple}">${best?MONTH_SHORT[best.m]:'—'}</div>
+      <div class="sc-sub">${best?best.pct+'%':''}</div>
+    </div>
+    <div class="stat-card" style="border-top:3px solid ${C.green}">
+      <div class="sc-label">Score moyen</div>
+      <div class="sc-value" style="color:${C.green}">${avg}</div>
+      <div class="sc-sub">sur l'année</div>
+    </div>
+    <div class="stat-card" style="border-top:3px solid ${C.green}">
+      <div class="sc-label">Top habitude</div>
+      <div class="sc-value">${bh.h.emoji}</div>
+      <div class="sc-sub">${bh.h.name} · ${bh.pct}%</div>
+    </div>
+    <div class="stat-card" style="border-top:3px solid ${C.red}">
+      <div class="sc-label">À renforcer</div>
+      <div class="sc-value">${wh.h.emoji}</div>
+      <div class="sc-sub">${wh.h.name} · ${wh.pct}%</div>
+    </div>`;
+
+  // ANNUAL LINE CHART
+  requestAnimationFrame(() => {
+    drawLineChart('chart-annual', MONTH_SHORT, [{ data:monthly.map(x=>x.pct), color:C.green, fill:C.green }]);
+  });
+
+  // MINI MONTHS
+  const mm = document.getElementById('mini-months');
+  mm.innerHTML = '';
+  for (let mo=0; mo<12; mo++) {
+    const lastDay=new Date(yearState,mo+1,0).getDate(), first=new Date(yearState,mo,1), pad=dayIdx(first);
+    const cells = [...Array(pad).fill(null), ...Array.from({length:lastDay},(_,i)=>i+1)];
+    const div = document.createElement('div');
+    div.innerHTML = `<div class="mini-month-name">${MONTH_SHORT[mo]}</div><div class="mini-month-grid" id="mm-${mo}"></div>`;
+    mm.appendChild(div);
+    const grid = div.querySelector(`#mm-${mo}`);
+    cells.forEach(c => {
+      const cell = document.createElement('div');
+      cell.className = 'mini-cell';
+      if (c===null) { cell.style.background='transparent'; }
+      else {
+        const d=new Date(yearState,mo,c), pct=d>T||beforeStart(d)?null:dayPct(d);
+        cell.style.background = d>T||beforeStart(d) ? (document.documentElement.dataset.theme==='light'?'rgba(24,27,52,.05)':'rgba(255,255,255,.05)') : (rygColor(pct)||'var(--track)');
+        cell.addEventListener('mouseenter', e => showTip(e, `<strong>${c} ${MONTH_SHORT[mo]}</strong><br>${pct!==null?pct+'%':'—'}`));
+        cell.addEventListener('mouseleave', hideTip);
+      }
+      grid.appendChild(cell);
+    });
+  }
+}
+
+/* ============================================================
+   STREAKS VIEW
+   ============================================================ */
+function renderStreaks() {
+  const T = today();
+  let perfectWeeks=0;
+  let m=new Date(TRACKING_START);
+  while (m<=T) { const s=rangeStats(m,addDays(m,6)); if(s.expected>0&&s.pct===100)perfectWeeks++; m=addDays(m,7); }
+  const totalDays=Math.round((T-TRACKING_START)/86400000)+1;
+  const totalComp=Object.values(APP.completions).reduce((s,a)=>s+a.length,0);
+
+  document.getElementById('streak-global-cards').innerHTML = `
+    <div class="stat-card" style="border-top:3px solid ${C.purple}">
+      <div class="sc-label">Semaines parfaites</div>
+      <div class="sc-value" style="color:${C.purple}">${perfectWeeks}</div>
+      <div class="sc-sub">100% sur 7 jours</div>
+    </div>
+    <div class="stat-card" style="border-top:3px solid ${C.green}">
+      <div class="sc-label">Jours suivis</div>
+      <div class="sc-value" style="color:${C.green}">${totalDays}</div>
+      <div class="sc-sub">depuis le 17 mai</div>
+    </div>
+    <div class="stat-card" style="border-top:3px solid ${C.yellow}">
+      <div class="sc-label">Total complétions</div>
+      <div class="sc-value" style="color:${C.yellow}">${totalComp}</div>
+      <div class="sc-sub">toutes habitudes</div>
+    </div>`;
+
+  const rows = HABITS.map(h => ({ h, current:currentStreak(h), best:bestStreak(h), total:Object.values(APP.completions).filter(a=>a.includes(h.id)).length }));
+
+  document.getElementById('streak-habit-cards').innerHTML = rows.map(r => `
+    <div class="streak-card">
+      <div class="sk-head"><span class="sk-emoji">${r.h.emoji}</span><span class="sk-name">${r.h.name}</span></div>
+      <div class="sk-stats">
+        <div><div class="sk-num" style="color:${C.red}">🔥 ${r.current}</div><div class="sk-lbl">En cours</div></div>
+        <div><div class="sk-num" style="color:${C.purple}">${r.best}</div><div class="sk-lbl">Record</div></div>
+        <div><div class="sk-num">${r.total}</div><div class="sk-lbl">Total</div></div>
+      </div>
+    </div>`).join('');
+
+  requestAnimationFrame(() => {
+    drawBarChart('chart-streaks', rows.map(r=>r.h.emoji), [
+      { data:rows.map(r=>r.current), color:C.red },
+      { data:rows.map(r=>r.best),    color:C.green },
+    ]);
+  });
+}
+
+/* ============================================================
+   TOGGLE HABIT
+   ============================================================ */
+function toggleHabit(iso, habitId) {
+  if (!APP.completions[iso]) APP.completions[iso] = [];
+  const arr = APP.completions[iso];
+  const idx = arr.indexOf(habitId);
+  if (idx >= 0) arr.splice(idx, 1); else arr.push(habitId);
+  if (!arr.length) delete APP.completions[iso];
+
+  // confetti if day complete
+  const dt = new Date(iso+'T00:00:00');
+  const need = expectedOn(dt).map(h=>h.id);
+  const done = new Set(APP.completions[iso]||[]);
+  if (need.length && need.every(id=>done.has(id))) setTimeout(burst, 30);
+
+  saveData();
+  updateTopbar();
+  updateSidebarScore();
+  renderCurrentView();
+}
+
+/* ============================================================
+   WEEK / MONTH / YEAR NAV
+   ============================================================ */
+document.getElementById('week-prev').addEventListener('click', () => { weekOffset--; renderWeekly(); });
+document.getElementById('week-next').addEventListener('click', () => { weekOffset=Math.min(0,weekOffset+1); renderWeekly(); });
+
+document.getElementById('month-prev').addEventListener('click', () => {
+  const d=new Date(monthState.y,monthState.m-1,1); monthState={y:d.getFullYear(),m:d.getMonth()}; renderMonthly();
+});
+document.getElementById('month-next').addEventListener('click', () => {
+  const d=new Date(monthState.y,monthState.m+1,1);
+  const T=today();
+  if (d<=new Date(T.getFullYear(),T.getMonth(),1)) { monthState={y:d.getFullYear(),m:d.getMonth()}; renderMonthly(); }
+});
+
+document.getElementById('year-prev').addEventListener('click', () => { yearState--; renderAnnual(); });
+document.getElementById('year-next').addEventListener('click', () => { const T=today(); yearState=Math.min(T.getFullYear(),yearState+1); renderAnnual(); });
+
+/* ============================================================
+   THEME TOGGLE
+   ============================================================ */
+let isDark = true;
+document.getElementById('theme-btn').addEventListener('click', () => {
+  isDark = !isDark;
+  document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+  document.getElementById('theme-label').textContent = isDark ? 'Mode clair' : 'Mode sombre';
+  const icon = document.getElementById('theme-icon');
+  icon.innerHTML = isDark
+    ? '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'
+    : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+  try { localStorage.setItem('todogrowth_theme', isDark?'dark':'light'); } catch(e){}
+  renderCurrentView();
+});
+
+/* ============================================================
+   RENDER DISPATCH
+   ============================================================ */
+function renderCurrentView() {
+  if (currentView==='weekly')  renderWeekly();
+  if (currentView==='monthly') renderMonthly();
+  if (currentView==='annual')  renderAnnual();
+  if (currentView==='streaks') renderStreaks();
+}
+
+/* ============================================================
+   RESIZE REDRAW
+   ============================================================ */
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(renderCurrentView, 150);
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+APP = loadData();
+try { const t=localStorage.getItem('todogrowth_theme'); if(t==='light'){isDark=false;document.documentElement.dataset.theme='light';document.getElementById('theme-label').textContent='Mode sombre';} } catch(e){}
+updateTopbar();
+updateSidebarScore();
+renderWeekly();
+</script>
+</body>
+</html>
