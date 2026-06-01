@@ -1,11 +1,18 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>To-Do Growth</title>
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="logo-app.png">
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>To-Do Growth</title>
+<!-- PWA : permet l'ajout à l'écran d'accueil en mode application -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d0f1e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="To-Do Growth">
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -23,20 +30,103 @@
   --radius:18px; --font:'Poppins',system-ui,sans-serif;
 }
 [data-theme="light"]{
-  --bg:#f4f2ed; --panel:#fff; --card:#fff; --card2:#faf9f6;
-  --border:#ebe8e1; --text:#181b34; --muted:#7f7c6f; --faint:#a8a59a;
-  --track:#eeebe3; --grid:rgba(24,27,52,.06); --axis:#a8a59a;
-  --shadow:0 10px 28px rgba(24,27,52,.07);
+  --bg:#eef1f8; --panel:#ffffff; --card:#ffffff; --card2:#f4f6fb;
+  --border:#dde3ef; --text:#1a2138; --muted:#5a6486; --faint:#9aa2bd;
+  --track:#e4e8f2; --grid:rgba(26,33,56,.07); --axis:#9aa2bd;
+  --shadow:0 10px 28px rgba(26,33,56,.08);
 }
 html,body{height:100%;overflow:hidden}
-body{font-family:var(--font);background:var(--bg);color:var(--text);display:flex;height:100vh;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 
 /* ── SCROLLBAR ───────────────────────────────────────────── */
 ::-webkit-scrollbar{width:6px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
-/* ── SIDEBAR ─────────────────────────────────────────────── */
+.hidden{display:none!important}
+
+/* ════════════════════════════════════════════════════════════
+   AUTH SCREEN  (login / signup)
+   ════════════════════════════════════════════════════════════ */
+#auth-screen,#onboarding-screen{
+  position:fixed;inset:0;z-index:200;background:var(--bg);
+  display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;
+  padding:40px 18px;
+  background-image:
+    radial-gradient(ellipse 70% 50% at 15% -10%, rgba(0,210,135,.10) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 45% at 90% 110%, rgba(164,140,255,.08) 0%, transparent 55%);
+}
+.auth-card{width:100%;max-width:430px;margin:auto;background:var(--card);border:1px solid var(--border);border-radius:22px;padding:30px 28px;box-shadow:var(--shadow);animation:fadeUp .4s ease}
+.auth-brand{display:flex;align-items:center;gap:13px;justify-content:center;margin-bottom:8px}
+.auth-brand .brand-name{font-size:23px;font-weight:800;letter-spacing:-.03em}
+.auth-brand .brand-name span{color:var(--green)}
+.auth-tagline{text-align:center;font-size:13px;color:var(--muted);margin-bottom:24px}
+.auth-tabs{display:flex;background:var(--card2);border:1px solid var(--border);border-radius:13px;padding:4px;margin-bottom:22px}
+.auth-tab{flex:1;padding:10px;border:none;background:transparent;color:var(--muted);font-family:var(--font);font-size:13.5px;font-weight:600;border-radius:10px;cursor:pointer;transition:.15s}
+.auth-tab.active{background:var(--green);color:var(--ink)}
+.field{margin-bottom:15px}
+.field label{display:block;font-size:11.5px;font-weight:600;color:var(--muted);margin-bottom:6px;letter-spacing:.2px}
+.field input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:14px;padding:12px 14px;border-radius:11px;outline:none;transition:.15s}
+.field input:focus{border-color:var(--green)}
+.field input::placeholder{color:var(--faint)}
+.btn-primary{width:100%;padding:13px;border:none;border-radius:12px;background:var(--green);color:var(--ink);font-family:var(--font);font-size:14.5px;font-weight:700;cursor:pointer;transition:.15s;margin-top:6px}
+.btn-primary:hover{filter:brightness(1.05);transform:translateY(-1px)}
+.btn-primary:active{transform:none}
+.btn-ghost{width:100%;padding:12px;border:1px solid var(--border);border-radius:12px;background:transparent;color:var(--muted);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:.15s;margin-top:12px}
+.btn-ghost:hover{background:var(--card2);color:var(--text)}
+.auth-err{font-size:12.5px;color:var(--red);margin-top:10px;min-height:16px;text-align:center;font-weight:500}
+.auth-foot{text-align:center;font-size:11px;color:var(--faint);margin-top:18px}
+.auth-foot .sig{color:var(--purple);font-weight:600}
+.field-hint{font-size:11px;color:var(--faint);margin-top:5px}
+.stay-row{display:flex;align-items:center;gap:9px;margin:2px 0 4px;cursor:pointer;user-select:none}
+.stay-row input{width:17px;height:17px;accent-color:var(--green);cursor:pointer;flex-shrink:0}
+.stay-row label,.stay-row span{font-size:12.5px;color:var(--muted);cursor:pointer;margin:0}
+
+/* ════════════════════════════════════════════════════════════
+   ONBOARDING
+   ════════════════════════════════════════════════════════════ */
+.onb-card{width:100%;max-width:760px;margin:auto;background:var(--card);border:1px solid var(--border);border-radius:22px;padding:28px 28px 24px;box-shadow:var(--shadow);animation:fadeUp .4s ease}
+.onb-steps{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.onb-step-dot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--card2);color:var(--faint);border:1px solid var(--border)}
+.onb-step-dot.active{background:var(--green);color:var(--ink);border-color:var(--green)}
+.onb-step-dot.done{background:rgba(0,210,135,.2);color:var(--green);border-color:rgba(0,210,135,.4)}
+.onb-step-line{flex:1;height:2px;background:var(--border)}
+.onb-title{font-size:24px;font-weight:800;letter-spacing:-.02em;margin:18px 0 4px}
+.onb-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.onb-body{max-height:60vh;overflow-y:auto;padding-right:6px;margin:0 -6px 0 0}
+.cat-block{margin-bottom:20px}
+.cat-head{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.4px;color:var(--muted);text-transform:uppercase;margin-bottom:11px}
+.task-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:9px}
+.task-chip{display:flex;align-items:center;gap:9px;padding:11px 13px;border-radius:13px;border:1px solid var(--border);background:var(--card2);cursor:pointer;transition:.15s;user-select:none}
+.task-chip:hover{border-color:var(--muted)}
+.task-chip.sel{border-color:var(--green);background:rgba(0,210,135,.12)}
+.task-chip .tc-emoji{font-size:17px;flex-shrink:0}
+.task-chip .tc-name{font-size:13px;font-weight:500;line-height:1.25}
+.task-chip .tc-check{margin-left:auto;width:19px;height:19px;border-radius:6px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;transition:.15s}
+.task-chip.sel .tc-check{background:var(--green);border-color:var(--green);color:var(--ink)}
+/* step 2 config rows */
+.cfg-row{background:var(--card2);border:1px solid var(--border);border-radius:15px;padding:15px 16px;margin-bottom:11px}
+.cfg-top{display:flex;align-items:center;gap:10px;margin-bottom:13px;flex-wrap:wrap}
+.cfg-emoji{font-size:18px}
+.cfg-name{font-size:14.5px;font-weight:600}
+.cfg-freq{margin-left:auto;font-size:12px;font-weight:700;color:var(--green);background:rgba(0,210,135,.12);padding:4px 11px;border-radius:9px}
+.cfg-grid{display:grid;grid-template-columns:1fr;gap:13px}
+.cfg-lbl{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:7px;display:block;letter-spacing:.2px}
+.days-row{display:flex;gap:6px;flex-wrap:wrap}
+.day-toggle{width:38px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;transition:.15s}
+.day-toggle.on{background:var(--green);border-color:var(--green);color:var(--ink)}
+.cfg-date input{background:var(--card);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:9px 12px;border-radius:10px;outline:none;width:100%;max-width:200px}
+.cfg-date input:focus{border-color:var(--green)}
+.onb-actions{display:flex;gap:10px;margin-top:20px}
+.onb-actions .btn-primary{margin-top:0}
+.onb-actions .btn-ghost{margin-top:0;width:auto;padding:13px 22px}
+.onb-count{font-size:12.5px;color:var(--muted);align-self:center;margin-right:auto}
+
+/* ════════════════════════════════════════════════════════════
+   APP SHELL  (sidebar + main) — design existant conservé
+   ════════════════════════════════════════════════════════════ */
+#app-shell{display:flex;height:100vh;width:100%}
+
 #sidebar{width:252px;min-width:252px;height:100vh;display:flex;flex-direction:column;padding:22px 16px;background:var(--panel);border-right:1px solid var(--border);overflow-y:auto}
 .brand{display:flex;align-items:center;gap:12px;padding:2px 6px;margin-bottom:28px}
 .brand-svg{flex-shrink:0}
@@ -56,14 +146,20 @@ nav{display:flex;flex-direction:column;gap:4px}
 .score-block .sb-tag{font-size:12px;font-weight:600;margin-top:4px}
 .theme-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;border-radius:11px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12.5px;font-family:var(--font);cursor:pointer;transition:.15s}
 .theme-btn:hover{background:var(--card2);color:var(--text)}
+.signature{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:var(--faint);padding-top:4px;letter-spacing:.2px}
+.signature b{color:var(--purple);font-weight:600}
 
 /* ── MAIN ────────────────────────────────────────────────── */
 #main{flex:1;display:flex;flex-direction:column;min-width:0;height:100vh;overflow:hidden}
-#topbar{padding:17px 30px;border-bottom:1px solid var(--border);background:var(--panel);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+#topbar{padding:17px 30px;border-bottom:1px solid var(--border);background:var(--panel);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:12px}
 .tb-title{font-size:16px;font-weight:700}
 .tb-date{font-size:12.5px;color:var(--faint);margin-top:2px}
+.tb-right{display:flex;align-items:center;gap:10px}
 .tb-chip{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;padding:9px 18px;border-radius:22px}
 .tb-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+.tb-icon-btn{width:38px;height:38px;border-radius:11px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;flex-shrink:0}
+.tb-icon-btn:hover{background:var(--card2);color:var(--text)}
+.tb-icon-btn.mobile-only{display:none}
 #content{flex:1;overflow-y:auto;padding:26px 30px}
 
 /* ── VIEWS ───────────────────────────────────────────────── */
@@ -71,7 +167,7 @@ nav{display:flex;flex-direction:column;gap:4px}
 .view.active{display:block}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .view-title{margin-bottom:20px}
-.view-title h1{font-size:30px;font-weight:800;letter-spacing:-.03em}
+.view-title h1{font-size:30px;font-weight:800;letter-spacing:-.03em;color:var(--text)}
 .view-title p{font-size:13.5px;color:var(--muted);margin-top:4px}
 
 /* ── PANEL ───────────────────────────────────────────────── */
@@ -111,6 +207,7 @@ nav{display:flex;flex-direction:column;gap:4px}
 .today-item.done .ti-name{text-decoration:line-through;color:var(--faint)}
 .ti-tag{font-size:11.5px;font-weight:700;color:var(--faint)}
 .today-item.done .ti-tag{color:var(--green)}
+.empty-note{font-size:13px;color:var(--faint);padding:14px 2px;line-height:1.6}
 /* GRID MATRIX */
 .gm-wrap{overflow-x:auto}
 .gm-table{border-collapse:separate;border-spacing:5px;min-width:100%}
@@ -180,7 +277,7 @@ canvas{display:block}
 /* ── MONTH NAV ───────────────────────────────────────────── */
 .month-nav{display:flex;align-items:center;gap:10px}
 .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-.section-head h1{font-size:30px;font-weight:800;letter-spacing:-.03em}
+.section-head h1{font-size:30px;font-weight:800;letter-spacing:-.03em;color:var(--text)}
 
 /* ── CONFETTI ────────────────────────────────────────────── */
 .confetti-piece{position:fixed;pointer-events:none;z-index:9999;width:9px;height:9px;border-radius:2px}
@@ -188,10 +285,83 @@ canvas{display:block}
 /* ── TOOLTIP ─────────────────────────────────────────────── */
 #tooltip{position:fixed;pointer-events:none;z-index:1000;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:9px 13px;font-size:12.5px;font-family:var(--font);color:var(--text);box-shadow:var(--shadow);display:none;line-height:1.6}
 
-/* ── RESPONSIVE ──────────────────────────────────────────── */
+/* ════════════════════════════════════════════════════════════
+   WEEKLY SUMMARY MODAL
+   ════════════════════════════════════════════════════════════ */
+#summary-overlay{position:fixed;inset:0;z-index:300;background:rgba(8,10,22,.62);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px;animation:fadeUp .25s ease}
+.summary-card{width:100%;max-width:440px;background:var(--card);border:1px solid var(--border);border-radius:22px;padding:26px 26px 22px;box-shadow:var(--shadow);max-height:88vh;overflow-y:auto}
+.sum-head{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.sum-icon{font-size:22px}
+.sum-title{font-size:19px;font-weight:800;letter-spacing:-.02em}
+.sum-period{font-size:12.5px;color:var(--muted);margin-bottom:18px}
+.sum-hero{border-radius:16px;padding:18px 20px;color:var(--ink);position:relative;overflow:hidden;margin-bottom:16px}
+.sum-hero .hero-circle{width:120px;height:120px;top:-30px;right:-30px}
+.sum-hero-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;position:relative}
+.sum-hero-val{font-size:46px;font-weight:800;line-height:1;margin-top:4px;position:relative}
+.sum-hero-badge{display:inline-block;font-size:12.5px;font-weight:700;background:rgba(24,27,52,.18);padding:4px 12px;border-radius:9px;margin-top:8px;position:relative}
+.sum-rows{display:flex;flex-direction:column;gap:9px;margin-bottom:16px}
+.sum-row{display:flex;align-items:center;gap:11px;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:11px 14px}
+.sum-row .sr-emoji{font-size:16px}
+.sum-row .sr-name{font-size:13.5px;font-weight:500;flex:1}
+.sum-row .sr-val{font-size:13.5px;font-weight:700}
+.sum-msg{font-size:13px;color:var(--muted);line-height:1.65;background:rgba(0,210,135,.08);border:1px solid rgba(0,210,135,.2);border-radius:12px;padding:13px 15px;margin-bottom:16px}
+.sum-msg b{color:var(--text)}
+
+/* ════════════════════════════════════════════════════════════
+   MOBILE BOTTOM NAV  (horizontale, compacte, icône + label)
+   ════════════════════════════════════════════════════════════ */
+.mobile-nav{
+  display:none;position:fixed;left:0;right:0;bottom:0;z-index:95;
+  background:var(--panel);border-top:1px solid var(--border);
+  padding:8px 4px calc(8px + env(safe-area-inset-bottom));
+  box-shadow:0 -6px 20px rgba(0,0,0,.18);
+}
+.mobile-nav.show{display:grid;grid-template-columns:repeat(5,1fr);gap:2px}
+.mnav-btn{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  border:none;background:transparent;color:var(--faint);
+  font-family:var(--font);font-size:10.5px;font-weight:600;cursor:pointer;
+  border-radius:12px;padding:6px 2px;transition:.15s;min-height:50px;
+}
+.mnav-btn svg{width:21px;height:21px;opacity:.8;flex-shrink:0}
+.mnav-btn span{line-height:1;white-space:nowrap}
+.mnav-btn.active{color:var(--green);background:rgba(0,210,135,.12)}
+.mnav-btn.active svg{opacity:1}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ════════════════════════════════════════════════════════════ */
 @media(max-width:1100px){.stat-grid-4{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:900px){.week-layout{grid-template-columns:1fr}.cal-grid-2{grid-template-columns:1fr}}
-@media(max-width:700px){.mini-months-grid{grid-template-columns:repeat(3,1fr)}.streak-grid{grid-template-columns:repeat(2,1fr)}}
+
+@media(max-width:760px){
+  html,body{overflow:auto;height:auto}
+  #app-shell{flex-direction:column;height:auto;min-height:100vh}
+  #sidebar{display:none}
+  #main{height:auto;min-height:100vh;overflow:visible}
+  #topbar{padding:13px 16px;position:sticky;top:0;z-index:80}
+  .tb-title{font-size:15px}
+  #content{overflow:visible;padding:18px 15px calc(96px + env(safe-area-inset-bottom))}
+  .tb-icon-btn.mobile-only{display:flex}
+  /* la barre mobile est affichée/masquée par JS via la classe .show */
+  .view-title h1,.section-head h1{font-size:23px}
+  .stat-grid-4{grid-template-columns:repeat(2,1fr);gap:10px}
+  .stat-grid-3{grid-template-columns:1fr;gap:10px}
+  .streak-grid{grid-template-columns:1fr 1fr}
+  .mini-months-grid{grid-template-columns:repeat(3,1fr);gap:12px}
+  .hero-value{font-size:46px}
+  .hb-row{grid-template-columns:96px 1fr;gap:9px}
+  .hb-meta{grid-column:1 / -1;justify-content:flex-start;margin-top:-4px}
+  .tb-chip{padding:8px 13px;font-size:12px}
+  .panel{padding:16px}
+  .onb-card,.auth-card{padding:22px 18px}
+  .onb-title{font-size:21px}
+  .task-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:420px){
+  .task-grid{grid-template-columns:1fr}
+  .streak-grid{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -199,197 +369,317 @@ canvas{display:block}
 <!-- TOOLTIP -->
 <div id="tooltip"></div>
 
-<!-- SIDEBAR -->
-<aside id="sidebar">
-  <div class="brand">
-    <svg class="brand-svg" width="36" height="36" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="2" y="32" width="30" height="30" rx="9" fill="#ff3d57"/>
-      <path d="M13 47.5 L16 50.5 L21.5 44" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-      <rect x="17" y="18" width="30" height="30" rx="9" fill="#ffcb00"/>
-      <path d="M28 33.5 L31 36.5 L36.5 30" stroke="#181b34" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-      <rect x="32" y="4" width="30" height="30" rx="9" fill="#00d287"/>
-      <path d="M43 19.5 L46 22.5 L51.5 16" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <div>
+<!-- ══════════════════════════ AUTH SCREEN ══════════════════════════ -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <svg width="34" height="34" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="32" width="30" height="30" rx="9" fill="#ff3d57"/>
+        <path d="M13 47.5 L16 50.5 L21.5 44" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="17" y="18" width="30" height="30" rx="9" fill="#ffcb00"/>
+        <path d="M28 33.5 L31 36.5 L36.5 30" stroke="#181b34" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="32" y="4" width="30" height="30" rx="9" fill="#00d287"/>
+        <path d="M43 19.5 L46 22.5 L51.5 16" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
       <div class="brand-name">To-Do <span>Growth</span></div>
-      <div class="brand-sub">Tes habitudes, ton score</div>
+    </div>
+    <div class="auth-tagline">Tes habitudes, ton score — sur tous tes appareils.</div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login">Connexion</button>
+      <button class="auth-tab" id="tab-signup">Créer un compte</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="form-login">
+      <div class="field">
+        <label>Adresse e-mail</label>
+        <input type="email" id="login-email" placeholder="toi@exemple.com" autocomplete="email"/>
+      </div>
+      <div class="field">
+        <label>Mot de passe</label>
+        <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"/>
+      </div>
+      <label class="stay-row">
+        <input type="checkbox" id="stay-logged" checked/>
+        <span>Rester connecté sur cet appareil</span>
+      </label>
+      <button class="btn-primary" id="btn-login">Se connecter</button>
+      <button class="btn-ghost" id="btn-demo">✦ Voir la démo (compte exemple)</button>
+      <div class="auth-err" id="login-err"></div>
+    </div>
+
+    <!-- SIGNUP -->
+    <div id="form-signup" class="hidden">
+      <div class="field">
+        <label>Adresse e-mail</label>
+        <input type="email" id="su-email" placeholder="toi@exemple.com" autocomplete="email"/>
+      </div>
+      <div class="field">
+        <label>Téléphone</label>
+        <input type="tel" id="su-phone" placeholder="+33 6 12 34 56 78" autocomplete="tel"/>
+      </div>
+      <div class="field">
+        <label>Mot de passe</label>
+        <input type="password" id="su-pass" placeholder="8 caractères minimum" autocomplete="new-password"/>
+        <div class="field-hint">Au moins 8 caractères.</div>
+      </div>
+      <div class="field">
+        <label>Confirmer le mot de passe</label>
+        <input type="password" id="su-pass2" placeholder="••••••••" autocomplete="new-password"/>
+      </div>
+      <button class="btn-primary" id="btn-signup">Créer mon compte</button>
+      <div class="auth-err" id="su-err"></div>
+    </div>
+
+    <div class="auth-foot">Conçu par <span class="sig">Massimo Epicureo</span></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ ONBOARDING ══════════════════════════ -->
+<div id="onboarding-screen" class="hidden">
+  <div class="onb-card">
+    <div class="onb-steps">
+      <div class="onb-step-dot active" id="dot-1">1</div>
+      <div class="onb-step-line"></div>
+      <div class="onb-step-dot" id="dot-2">2</div>
+    </div>
+
+    <!-- STEP 1 : choose tasks -->
+    <div id="onb-step-1">
+      <div class="onb-title">Choisis tes tâches de la semaine</div>
+      <div class="onb-sub">Sélectionne les habitudes que tu veux suivre. Tu pourras tout ajuster plus tard.</div>
+      <div class="onb-body" id="task-library"></div>
+      <div class="onb-actions">
+        <span class="onb-count" id="sel-count">0 tâche sélectionnée</span>
+        <button class="btn-primary" id="btn-to-step2" style="width:auto;padding:13px 26px">Continuer →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2 : configure -->
+    <div id="onb-step-2" class="hidden">
+      <div class="onb-title">Fréquence, jours & date de démarrage</div>
+      <div class="onb-sub">Pour chaque tâche : choisis les jours de la semaine et la date à laquelle tu as commencé.</div>
+      <div class="onb-body" id="task-config"></div>
+      <div class="onb-actions">
+        <button class="btn-ghost" id="btn-back-step1">← Retour</button>
+        <button class="btn-primary" id="btn-finish" style="margin-left:auto;width:auto;padding:13px 26px">Lancer mon dashboard 🚀</button>
+      </div>
     </div>
   </div>
+</div>
 
-  <nav>
-    <button class="nav-btn active" data-view="weekly">
-      <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      Vue hebdo
-    </button>
-    <button class="nav-btn" data-view="monthly">
-      <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-      Rapport mensuel
-    </button>
-    <button class="nav-btn" data-view="annual">
-      <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      Vue annuelle
-    </button>
-    <button class="nav-btn" data-view="streaks">
-      <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 2.5.93 4.79 2.46 6.54L12 22l7.54-3.46C21.07 16.79 22 14.5 22 12c0-5.52-4.48-10-10-10z"/><path d="M12 8v4l2 2"/></svg>
-      Séries & records
-    </button>
-  </nav>
-
-  <div class="sidebar-foot">
-    <div class="score-block" id="sidebar-score">
-      <div class="sb-label">Score discipline · ce mois</div>
-      <div class="sb-val" id="sidebar-score-val">—</div>
-      <div class="sb-tag" id="sidebar-score-tag"></div>
-    </div>
-    <button class="theme-btn" id="theme-btn">
-      <svg id="theme-icon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-      <span id="theme-label">Mode clair</span>
-    </button>
-  </div>
-</aside>
-
-<!-- MAIN -->
-<div id="main">
-  <header id="topbar">
-    <div>
-      <div class="tb-title" id="topbar-title">Vue hebdo</div>
-      <div class="tb-date" id="topbar-date"></div>
-    </div>
-    <div class="tb-chip" id="today-chip" style="background:rgba(0,210,135,.15);color:#00d287">
-      <span class="tb-dot"></span>
-      <span id="today-chip-txt">Aujourd'hui · —%</span>
-    </div>
-  </header>
-
-  <div id="content">
-
-    <!-- ══ VIEW: WEEKLY ══════════════════════════════════════ -->
-    <div class="view active" id="view-weekly">
-      <div class="view-title">
-        <h1>Vue hebdo</h1>
-        <p id="week-subtitle"></p>
+<!-- ══════════════════════════ APP SHELL ══════════════════════════ -->
+<div id="app-shell" class="hidden">
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="brand">
+      <svg class="brand-svg" width="36" height="36" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="32" width="30" height="30" rx="9" fill="#ff3d57"/>
+        <path d="M13 47.5 L16 50.5 L21.5 44" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="17" y="18" width="30" height="30" rx="9" fill="#ffcb00"/>
+        <path d="M28 33.5 L31 36.5 L36.5 30" stroke="#181b34" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="32" y="4" width="30" height="30" rx="9" fill="#00d287"/>
+        <path d="M43 19.5 L46 22.5 L51.5 16" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        <div class="brand-name">To-Do <span>Growth</span></div>
+        <div class="brand-sub">Tes habitudes, ton score</div>
       </div>
+    </div>
 
-      <div class="prog-wrap">
-        <div class="prog-head">
-          <span class="prog-label">Complétion de la semaine</span>
-          <span class="prog-pct" id="week-pct-label">0% · 0/0</span>
-        </div>
-        <div class="prog-track"><div class="prog-fill" id="week-prog" style="width:0%"></div></div>
-        <div class="week-nav">
-          <button class="icon-btn" id="week-prev">&#8249;</button>
-          <button class="icon-btn" id="week-next" disabled>&#8250;</button>
+    <nav>
+      <button class="nav-btn active" data-view="weekly">
+        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Vue hebdo
+      </button>
+      <button class="nav-btn" data-view="monthly">
+        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Rapport mensuel
+      </button>
+      <button class="nav-btn" data-view="annual">
+        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Vue annuelle
+      </button>
+      <button class="nav-btn" data-view="streaks">
+        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 2.5.93 4.79 2.46 6.54L12 22l7.54-3.46C21.07 16.79 22 14.5 22 12c0-5.52-4.48-10-10-10z"/><path d="M12 8v4l2 2"/></svg>
+        Séries & records
+      </button>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="score-block" id="sidebar-score">
+        <div class="sb-label">Score discipline · ce mois</div>
+        <div class="sb-val" id="sidebar-score-val">—</div>
+        <div class="sb-tag" id="sidebar-score-tag"></div>
+      </div>
+      <button class="theme-btn" id="theme-btn">
+        <svg id="theme-icon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <span id="theme-label">Mode clair</span>
+      </button>
+      <button class="theme-btn" id="logout-btn">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Se déconnecter
+      </button>
+      <div class="signature">✦ <b>Massimo Epicureo</b></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div id="main">
+    <header id="topbar">
+      <div>
+        <div class="tb-title" id="topbar-title">Vue hebdo</div>
+        <div class="tb-date" id="topbar-date"></div>
+      </div>
+      <div class="tb-right">
+        <button class="tb-icon-btn" id="summary-btn" title="Résumé hebdomadaire">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+        </button>
+        <button class="tb-icon-btn mobile-only" id="theme-btn-m" title="Thème">
+          <svg id="theme-icon-m" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+        <div class="tb-chip" id="today-chip" style="background:rgba(0,210,135,.15);color:#00d287">
+          <span class="tb-dot"></span>
+          <span id="today-chip-txt">Aujourd'hui · —%</span>
         </div>
       </div>
+    </header>
 
-      <div class="week-layout">
-        <!-- Today list -->
-        <div class="panel panel-border-green">
-          <div class="panel-tab" style="background:#00d287"><span class="panel-tab-dot" style="background:rgba(255,255,255,.5)"></span>HABITUDES DU JOUR</div>
-          <div id="today-list"></div>
+    <div id="content">
+
+      <!-- ══ VIEW: WEEKLY ══ -->
+      <div class="view active" id="view-weekly">
+        <div class="view-title">
+          <h1>Vue hebdo</h1>
+          <p id="week-subtitle"></p>
         </div>
-        <!-- Week grid -->
-        <div class="panel panel-border-yellow">
-          <div class="panel-tab yellow" style="background:#ffcb00"><span class="panel-tab-dot" style="background:rgba(24,27,52,.3)"></span>GRILLE DE LA SEMAINE</div>
-          <div class="gm-wrap"><table class="gm-table" id="week-grid"></table></div>
-          <div class="ryg-legend">
-            <span><i style="background:#00d287"></i>Réussi</span>
-            <span><i style="background:#ff3d57"></i>Manqué</span>
-            <span><i style="background:var(--track)"></i>À venir</span>
+        <div class="prog-wrap">
+          <div class="prog-head">
+            <span class="prog-label">Complétion de la semaine</span>
+            <span class="prog-pct" id="week-pct-label">0% · 0/0</span>
+          </div>
+          <div class="prog-track"><div class="prog-fill" id="week-prog" style="width:0%"></div></div>
+          <div class="week-nav">
+            <button class="icon-btn" id="week-prev">&#8249;</button>
+            <button class="icon-btn" id="week-next" disabled>&#8250;</button>
+          </div>
+        </div>
+        <div class="week-layout">
+          <div class="panel panel-border-green">
+            <div class="panel-tab" style="background:#00d287"><span class="panel-tab-dot" style="background:rgba(255,255,255,.5)"></span>HABITUDES DU JOUR</div>
+            <div id="today-list"></div>
+          </div>
+          <div class="panel panel-border-yellow">
+            <div class="panel-tab yellow" style="background:#ffcb00"><span class="panel-tab-dot" style="background:rgba(24,27,52,.3)"></span>GRILLE DE LA SEMAINE</div>
+            <div class="gm-wrap"><table class="gm-table" id="week-grid"></table></div>
+            <div class="ryg-legend">
+              <span><i style="background:#00d287"></i>Réussi</span>
+              <span><i style="background:#ff3d57"></i>Manqué</span>
+              <span><i style="background:var(--track)"></i>À venir</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- ══ VIEW: MONTHLY ═════════════════════════════════════ -->
-    <div class="view" id="view-monthly">
-      <div class="section-head">
-        <h1 id="month-title">Mai 2026</h1>
-        <div class="month-nav">
-          <button class="icon-btn" id="month-prev">&#8249;</button>
-          <button class="icon-btn" id="month-next" disabled>&#8250;</button>
-        </div>
-      </div>
-
-      <div class="stat-grid-4" id="month-stat-cards"></div>
-
-      <div class="cal-grid-2">
-        <div class="panel panel-border-green">
-          <div class="panel-tab" style="background:#00d287"><span class="panel-tab-dot" style="background:rgba(255,255,255,.5)"></span>ÉVOLUTION QUOTIDIENNE</div>
-          <div class="chart-wrap" style="height:210px"><canvas id="chart-daily"></canvas></div>
-        </div>
-        <div class="panel panel-border-yellow">
-          <div class="panel-tab yellow" style="background:#ffcb00"><span class="panel-tab-dot" style="background:rgba(24,27,52,.3)"></span>CALENDRIER DU MOIS</div>
-          <div class="cal-daynames"><span>Lun</span><span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span></div>
-          <div class="cal-grid" id="cal-grid"></div>
-          <div class="ryg-legend" style="margin-top:14px">
-            <span><i style="background:#ff3d57"></i>Manqué</span>
-            <span><i style="background:#ffcb00"></i>En cours</span>
-            <span><i style="background:#00d287"></i>Réussi</span>
+      <!-- ══ VIEW: MONTHLY ══ -->
+      <div class="view" id="view-monthly">
+        <div class="section-head">
+          <h1 id="month-title">Mai 2026</h1>
+          <div class="month-nav">
+            <button class="icon-btn" id="month-prev">&#8249;</button>
+            <button class="icon-btn" id="month-next" disabled>&#8250;</button>
           </div>
         </div>
-      </div>
-
-      <div class="panel panel-border-red">
-        <div class="panel-tab" style="background:#ff3d57"><span class="panel-tab-dot" style="background:rgba(255,255,255,.5)"></span>PERFORMANCE PAR HABITUDE</div>
-        <div id="habit-bars"></div>
-      </div>
-    </div>
-
-    <!-- ══ VIEW: ANNUAL ══════════════════════════════════════ -->
-    <div class="view" id="view-annual">
-      <div class="section-head">
-        <h1 id="year-title">2026</h1>
-        <div class="month-nav">
-          <button class="icon-btn" id="year-prev">&#8249;</button>
-          <span style="font-size:14px;font-weight:600;color:var(--muted);min-width:50px;text-align:center" id="year-label">2026</span>
-          <button class="icon-btn" id="year-next" disabled>&#8250;</button>
+        <div class="stat-grid-4" id="month-stat-cards"></div>
+        <div class="cal-grid-2">
+          <div class="panel panel-border-green">
+            <div class="panel-tab" style="background:#00d287"><span class="panel-tab-dot" style="background:rgba(255,255,255,.5)"></span>ÉVOLUTION QUOTIDIENNE</div>
+            <div class="chart-wrap" style="height:210px"><canvas id="chart-daily"></canvas></div>
+          </div>
+          <div class="panel panel-border-yellow">
+            <div class="panel-tab yellow" style="background:#ffcb00"><span class="panel-tab-dot" style="background:rgba(24,27,52,.3)"></span>CALENDRIER DU MOIS</div>
+            <div class="cal-daynames"><span>Lun</span><span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span></div>
+            <div class="cal-grid" id="cal-grid"></div>
+            <div class="ryg-legend" style="margin-top:14px">
+              <span><i style="background:#ff3d57"></i>Manqué</span>
+              <span><i style="background:#ffcb00"></i>En cours</span>
+              <span><i style="background:#00d287"></i>Réussi</span>
+            </div>
+          </div>
+        </div>
+        <div class="panel panel-border-red">
+          <div class="panel-tab" style="background:#ff3d57"><span class="panel-tab-dot" style="background:rgba(255,255,255,.5)"></span>PERFORMANCE PAR HABITUDE</div>
+          <div id="habit-bars"></div>
         </div>
       </div>
 
-      <div class="stat-grid-4" id="annual-stat-cards"></div>
-
-      <div class="panel panel-border-green">
-        <div class="panel-tab" style="background:#00d287"><span class="panel-tab-dot" style="background:rgba(255,255,255,.5)"></span>SCORE DE DISCIPLINE PAR MOIS</div>
-        <div class="chart-wrap" style="height:220px"><canvas id="chart-annual"></canvas></div>
+      <!-- ══ VIEW: ANNUAL ══ -->
+      <div class="view" id="view-annual">
+        <div class="section-head">
+          <h1 id="year-title">2026</h1>
+          <div class="month-nav">
+            <button class="icon-btn" id="year-prev">&#8249;</button>
+            <span style="font-size:14px;font-weight:600;color:var(--muted);min-width:50px;text-align:center" id="year-label">2026</span>
+            <button class="icon-btn" id="year-next" disabled>&#8250;</button>
+          </div>
+        </div>
+        <div class="stat-grid-4" id="annual-stat-cards"></div>
+        <div class="panel panel-border-green">
+          <div class="panel-tab" style="background:#00d287"><span class="panel-tab-dot" style="background:rgba(255,255,255,.5)"></span>SCORE DE DISCIPLINE PAR MOIS</div>
+          <div class="chart-wrap" style="height:220px"><canvas id="chart-annual"></canvas></div>
+        </div>
+        <div class="panel panel-border-yellow">
+          <div class="panel-tab yellow" style="background:#ffcb00"><span class="panel-tab-dot" style="background:rgba(24,27,52,.3)"></span>APERÇU DES 12 MOIS</div>
+          <div class="mini-months-grid" id="mini-months"></div>
+        </div>
       </div>
 
-      <div class="panel panel-border-yellow">
-        <div class="panel-tab yellow" style="background:#ffcb00"><span class="panel-tab-dot" style="background:rgba(24,27,52,.3)"></span>APERÇU DES 12 MOIS</div>
-        <div class="mini-months-grid" id="mini-months"></div>
+      <!-- ══ VIEW: STREAKS ══ -->
+      <div class="view" id="view-streaks">
+        <div class="section-head"><h1>Séries & records</h1></div>
+        <div class="stat-grid-3" id="streak-global-cards"></div>
+        <div class="streak-grid" id="streak-habit-cards"></div>
+        <div class="panel panel-border-green">
+          <div class="panel-tab" style="background:#00d287"><span class="panel-tab-dot" style="background:rgba(255,255,255,.5)"></span>SÉRIE EN COURS VS RECORD</div>
+          <div class="chart-wrap" style="height:230px"><canvas id="chart-streaks"></canvas></div>
+        </div>
       </div>
-    </div>
 
-    <!-- ══ VIEW: STREAKS ═════════════════════════════════════ -->
-    <div class="view" id="view-streaks">
-      <div class="section-head"><h1>Séries & records</h1></div>
-      <div class="stat-grid-3" id="streak-global-cards"></div>
-      <div class="streak-grid" id="streak-habit-cards"></div>
-      <div class="panel panel-border-green">
-        <div class="panel-tab" style="background:#00d287"><span class="panel-tab-dot" style="background:rgba(255,255,255,.5)"></span>SÉRIE EN COURS VS RECORD</div>
-        <div class="chart-wrap" style="height:230px"><canvas id="chart-streaks"></canvas></div>
-      </div>
-    </div>
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app-shell -->
 
-  </div><!-- /content -->
-</div><!-- /main -->
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-nav" id="mobile-nav">
+  <button class="mnav-btn active" data-view="weekly" data-label="Vue hebdo">
+    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <span>Hebdo</span>
+  </button>
+  <button class="mnav-btn" data-view="monthly" data-label="Rapport mensuel">
+    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    <span>Mensuel</span>
+  </button>
+  <button class="mnav-btn" data-view="annual" data-label="Vue annuelle">
+    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    <span>Annuel</span>
+  </button>
+  <button class="mnav-btn" data-view="streaks" data-label="Séries & records">
+    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 2.5.93 4.79 2.46 6.54L12 22l7.54-3.46C21.07 16.79 22 14.5 22 12c0-5.52-4.48-10-10-10z"/><path d="M12 8v4l2 2"/></svg>
+    <span>Séries</span>
+  </button>
+  <button class="mnav-btn" id="mnav-logout">
+    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    <span>Quitter</span>
+  </button>
+</nav>
 
 <script>
 /* ============================================================
    CONSTANTS & HELPERS
    ============================================================ */
-const C = { red:'#ff3d57', yellow:'#ffcb00', green:'#00d287', ink:'#181b34', purple:'#a48cff', blue:'#3fa9f5' };
-const TRACKING_START = new Date('2026-05-17T00:00:00');
-const STORAGE_KEY = 'todogrowth_v1';
-
-const HABITS = [
-  { id:'water',   name:"1L d'eau",  emoji:'💧', color:C.blue,   days:[0,1,2,3,4,5,6] },
-  { id:'italian', name:'Italien',   emoji:'🇮🇹', color:C.green,  days:[0,1,2,3,4,5,6] },
-  { id:'news',    name:'Actualité', emoji:'📰', color:C.yellow, days:[0,2,4,6] },
-  { id:'sport',   name:'Sport',     emoji:'🏃', color:C.red,    days:[1,2,6] },
-  { id:'reading', name:'Lecture',   emoji:'📚', color:C.purple, days:[0,1,2,3,6] },
-  { id:'projet',  name:'Projet',    emoji:'🚀', color:'#ff7a59', days:[0,1,2,3,6] },
-];
+const C = { red:'#ff3d57', yellow:'#ffcb00', green:'#00d287', ink:'#181b34', purple:'#a48cff', blue:'#3fa9f5', orange:'#ff7a59' };
+const PALETTE = [C.blue, C.green, C.yellow, C.red, C.purple, C.orange];
 
 const DAY_SHORT = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 const DAY_NAMES = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
@@ -397,14 +687,21 @@ const MONTH_NAMES = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet',
 const MONTH_SHORT = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
 
 const fmtISO = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const parseISO = s => { const d=new Date(s+'T00:00:00'); d.setHours(0,0,0,0); return d; };
 const dayIdx = d => { const g=d.getDay(); return g===0?6:g-1; };
 const addDays = (d,n) => { const x=new Date(d); x.setDate(x.getDate()+n); x.setHours(0,0,0,0); return x; };
 const mondayOf = d => addDays(d, -dayIdx(d));
 const sameDay = (a,b) => fmtISO(a)===fmtISO(b);
 const today = () => { const d=new Date(); d.setHours(0,0,0,0); return d; };
-const beforeStart = d => d < TRACKING_START;
 const clamp = (v,lo,hi) => Math.max(lo,Math.min(hi,v));
 const lerp = (a,b,t) => Math.round(a+(b-a)*t);
+
+/* per-habit start helpers (remplace l'ancien TRACKING_START global) */
+let HABITS = [];                 // habitudes de l'utilisateur courant
+const habitStart = h => h._start || (h._start = parseISO(h.start));
+const habitActive = (h,d) => h.days.includes(dayIdx(d)) && d >= habitStart(h);
+const globalStart = () => HABITS.length ? new Date(Math.min(...HABITS.map(h=>habitStart(h).getTime()))) : today();
+const beforeAllStart = d => d < globalStart();
 
 // RED → YELLOW → GREEN interpolation
 function rygColor(pct) {
@@ -414,7 +711,6 @@ function rygColor(pct) {
   else           { const t=(pct-50)/50; r=lerp(255,0,t); g=lerp(203,210,t); b=lerp(0,135,t); }
   return `rgb(${r},${g},${b})`;
 }
-
 function scoreLabel(s) {
   if (s>=90) return { label:'Élite', color:C.purple };
   if (s>=75) return { label:'Excellent', color:C.green };
@@ -424,68 +720,300 @@ function scoreLabel(s) {
 }
 
 /* ============================================================
-   DEMO DATA (seeded, 17 May → today)
+   TASK LIBRARY  (liste exhaustive, sans parenthèses)
    ============================================================ */
-function mulberry32(a){return function(){a|=0;a=(a+0x6d2b79f5)|0;let t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};}
-const RATE = { water:.92, italian:.84, news:.74, sport:.60, reading:.70, projet:.50 };
+const TASK_LIBRARY = [
+  { cat:'🏋️ Sport & Corps', tasks:[
+    {id:'course',name:'Course à pied',emoji:'🏃'},
+    {id:'muscu',name:'Musculation',emoji:'🏋️'},
+    {id:'yoga',name:'Yoga',emoji:'🧘'},
+    {id:'natation',name:'Natation',emoji:'🏊'},
+    {id:'velo',name:'Vélo',emoji:'🚴'},
+    {id:'marche',name:'Marche',emoji:'🚶'},
+    {id:'hiit',name:'HIIT',emoji:'🔥'},
+    {id:'arts_martiaux',name:'Arts martiaux',emoji:'🥋'},
+    {id:'sport_co',name:'Sport collectif',emoji:'⚽'},
+    {id:'escalade',name:'Escalade',emoji:'🧗'},
+  ]},
+  { cat:'🧠 Mental & Bien-être', tasks:[
+    {id:'meditation',name:'Méditation',emoji:'🧘‍♂️'},
+    {id:'journaling',name:'Journaling',emoji:'📓'},
+    {id:'lecture',name:'Lecture',emoji:'📚'},
+    {id:'respiration',name:'Cohérence cardiaque',emoji:'🌬️'},
+    {id:'affirmations',name:'Affirmations',emoji:'✨'},
+    {id:'deconnexion',name:'Déconnexion digitale',emoji:'📵'},
+  ]},
+  { cat:'🍎 Alimentation & Santé', tasks:[
+    {id:'water',name:"2L d'eau",emoji:'💧'},
+    {id:'fruits',name:'5 fruits et légumes',emoji:'🥗'},
+    {id:'mealprep',name:'Préparer ses repas',emoji:'🍱'},
+    {id:'jeune',name:'Jeûne intermittent',emoji:'⏳'},
+    {id:'no_alcool',name:"Éviter l'alcool",emoji:'🚱'},
+    {id:'no_sucre',name:'Éviter le sucre',emoji:'🍬'},
+    {id:'vitamines',name:'Vitamines',emoji:'💊'},
+  ]},
+  { cat:'📚 Apprentissage & Carrière', tasks:[
+    {id:'langue',name:'Langue étrangère',emoji:'🗣️'},
+    {id:'formation',name:'Formation en ligne',emoji:'🎓'},
+    {id:'instrument',name:'Instrument de musique',emoji:'🎸'},
+    {id:'veille',name:'Veille professionnelle',emoji:'📰'},
+    {id:'projet',name:'Projet personnel',emoji:'🚀'},
+    {id:'revisions',name:'Révisions',emoji:'📝'},
+    {id:'podcast',name:'Podcast éducatif',emoji:'🎧'},
+  ]},
+  { cat:'💼 Productivité', tasks:[
+    {id:'objectifs',name:'Objectifs de la semaine',emoji:'🎯'},
+    {id:'todo',name:'To-do list du jour',emoji:'✅'},
+    {id:'inbox',name:'Inbox zéro',emoji:'📧'},
+    {id:'rangement',name:'Rangement',emoji:'🧹'},
+    {id:'planif',name:'Planifier sa journée',emoji:'🗓️'},
+    {id:'bilan',name:'Bilan du soir',emoji:'🌙'},
+  ]},
+  { cat:'🌱 Développement & Social', tasks:[
+    {id:'confort',name:'Sortir de sa zone de confort',emoji:'💪'},
+    {id:'rencontres',name:'Rencontrer du monde',emoji:'👥'},
+    {id:'appel',name:'Appeler un proche',emoji:'📞'},
+    {id:'gratitude',name:'Gratitude',emoji:'🙏'},
+    {id:'benevolat',name:'Bénévolat',emoji:'🤝'},
+    {id:'reseaux',name:'Limiter les réseaux',emoji:'📱'},
+  ]},
+  { cat:'😴 Sommeil & Récupération', tasks:[
+    {id:'minuit',name:'Coucher avant minuit',emoji:'🌜'},
+    {id:'sommeil',name:'7 à 8h de sommeil',emoji:'😴'},
+    {id:'routine_soir',name:'Routine du soir',emoji:'🛁'},
+    {id:'sieste',name:'Sieste',emoji:'💤'},
+  ]},
+];
+const TASK_BY_ID = {};
+TASK_LIBRARY.forEach(c => c.tasks.forEach(t => TASK_BY_ID[t.id] = { ...t, cat:c.cat }));
 
-function buildDemo() {
-  const rng = mulberry32(20260517);
-  const T = today();
-  const completions = {};
-  let d = new Date(TRACKING_START);
-  while (d <= T) {
-    const di = dayIdx(d), isToday = sameDay(d,T), done = [];
-    for (const h of HABITS) {
-      if (!h.days.includes(di)) continue;
-      if (isToday) { if (rng() < RATE[h.id]*.5) done.push(h.id); }
-      else if (rng() < RATE[h.id]) done.push(h.id);
-    }
-    if (done.length) completions[fmtISO(d)] = done;
-    d = addDays(d,1);
+/* ============================================================
+   CONFIGURATION SUPABASE
+   ============================================================ */
+const SUPABASE_URL = 'https://jzwwjlzqyemusjkofivo.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6d3dqbHpxeWVtdXNqa29maXZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMjYyNTQsImV4cCI6MjA5NTkwMjI1NH0.AgaQPq8oqZlleJTs3G5AEKP8PJ60eGEkRlxswgJ3Yp8';
+/* Où renvoyer l'utilisateur après le clic sur le lien de confirmation reçu par e-mail.
+   On utilise l'origine courante : fonctionne en local comme sur GitHub Pages. */
+const REDIRECT_URL = window.location.origin + window.location.pathname;
+
+/* Charge le SDK Supabase avec plusieurs CDN de secours (robustesse réseau) */
+let sb = null;
+function chargerScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src; s.onload = resolve; s.onerror = () => reject(new Error('échec ' + src));
+    document.head.appendChild(s);
+  });
+}
+async function initSupabase() {
+  const cdns = [
+    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+    'https://unpkg.com/@supabase/supabase-js@2',
+    'https://cdn.skypack.dev/@supabase/supabase-js@2',
+  ];
+  for (const url of cdns) {
+    try {
+      await chargerScript(url);
+      if (window.supabase && window.supabase.createClient) break;
+    } catch(e) { /* on tente le CDN suivant */ }
   }
-  return { completions, meta:{ createdAt:fmtISO(TRACKING_START), lastSeen:fmtISO(T) } };
+  if (!window.supabase || !window.supabase.createClient) {
+    throw new Error('SDK Supabase indisponible');
+  }
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 
 /* ============================================================
-   STORAGE
+   DATA STORE  (branché sur Supabase)
+   ------------------------------------------------------------
+   - Comptes réels : Supabase Auth + tables habits/completions,
+     chacun isolé par la Row Level Security (données privées).
+   - "Rester connecté" : géré nativement par Supabase
+     (persistSession) — multi-appareils, sans mot de passe stocké.
+   - Le bouton "démo" reste 100% local (aucune écriture en base).
    ============================================================ */
-let APP = null;
-let saveTimer = null;
+const Store = (() => {
+  let demoMode = false;
+  let demoData = null;   // { habits, completions } pour la démo locale
 
-function loadData() {
-  try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch(e){}
-  return buildDemo();
-}
-function saveData() {
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    APP.meta.lastSeen = fmtISO(today());
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(APP)); } catch(e){}
-  }, 300);
+  /* générateur pseudo-aléatoire reproductible (données de démo) */
+  function mulberry32(a){return function(){a|=0;a=(a+0x6d2b79f5)|0;let t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};}
+  function seedCompletions(habits, rateMap) {
+    const rng = mulberry32(20260517);
+    const T = today(), comp = {};
+    const start = new Date(Math.min(...habits.map(h=>parseISO(h.start).getTime())));
+    let d = new Date(start);
+    while (d <= T) {
+      const di = dayIdx(d), isToday = sameDay(d,T), done = [];
+      for (const h of habits) {
+        if (!h.days.includes(di) || d < parseISO(h.start)) continue;
+        const rate = (rateMap && rateMap[h.id] != null) ? rateMap[h.id] : 0.72;
+        if (isToday) { if (rng() < rate*.5) done.push(h.id); }
+        else if (rng() < rate) done.push(h.id);
+      }
+      if (done.length) comp[fmtISO(d)] = done;
+      d = addDays(d,1);
+    }
+    return comp;
+  }
+
+  function buildDemo() {
+    const demoHabits = [
+      { id:'water',   name:"1L d'eau",  emoji:'💧', color:C.blue,   days:[0,1,2,3,4,5,6], start:'2026-05-17' },
+      { id:'italian', name:'Italien',   emoji:'🇮🇹', color:C.green,  days:[0,1,2,3,4,5,6], start:'2026-05-17' },
+      { id:'news',    name:'Actualité', emoji:'📰', color:C.yellow, days:[0,2,4,6],       start:'2026-05-17' },
+      { id:'sport',   name:'Sport',     emoji:'🏃', color:C.red,    days:[1,2,6],         start:'2026-05-17' },
+      { id:'reading', name:'Lecture',   emoji:'📚', color:C.purple, days:[0,1,2,3,6],     start:'2026-05-17' },
+      { id:'projet',  name:'Projet',    emoji:'🚀', color:C.orange, days:[0,1,2,3,6],     start:'2026-05-17' },
+    ];
+    const RATE = { water:.92, italian:.84, news:.74, sport:.60, reading:.70, projet:.50 };
+    return { habits: demoHabits, completions: seedCompletions(demoHabits, RATE) };
+  }
+
+  return {
+    seedCompletions,
+    isDemo() { return demoMode; },
+
+    /* --- AUTH --- */
+    async signUp(email, phone, password) {
+      if (!sb) throw new Error('Connexion au serveur impossible. Vérifie ta connexion internet.');
+      let res;
+      try {
+        res = await sb.auth.signUp({
+          email: (email||'').trim().toLowerCase(),
+          password,
+          options: { data: { phone }, emailRedirectTo: REDIRECT_URL },
+        });
+      } catch(e) { throw new Error(traduireErreur(e.message)); }
+      if (res.error) throw new Error(traduireErreur(res.error.message));
+      demoMode = false;
+      return res.data.user;
+    },
+    async logIn(email, password) {
+      if (!sb) throw new Error('Connexion au serveur impossible. Vérifie ta connexion internet.');
+      let res;
+      try {
+        res = await sb.auth.signInWithPassword({
+          email: (email||'').trim().toLowerCase(),
+          password,
+        });
+      } catch(e) { throw new Error(traduireErreur(e.message)); }
+      if (res.error) throw new Error(traduireErreur(res.error.message));
+      demoMode = false;
+      return res.data.user;
+    },
+    logInDemo() { demoMode = true; demoData = buildDemo(); return demoData; },
+    async logOut() { demoMode = false; demoData = null; await sb.auth.signOut(); },
+
+    /* "rester connecté" : on choisit la durée de session.
+       Supabase persiste la session par défaut ; si l'utilisateur
+       NE veut PAS rester connecté, on bascule en session de page. */
+    setPersistence(stay) {
+      try {
+        if (!stay) sessionStorage.setItem('todogrowth_no_persist','1');
+        else sessionStorage.removeItem('todogrowth_no_persist');
+      } catch(e){}
+    },
+
+    async currentSession() {
+      const { data } = await sb.auth.getSession();
+      return data.session;
+    },
+
+    /* --- DONNÉES (habits + completions) --- */
+    async loadAll() {
+      if (demoMode) return demoData;
+      const { data: { user } } = await sb.auth.getUser();
+      if (!user) return { habits: [], completions: {} };
+      const [{ data: habits, error: he }, { data: comps, error: ce }] = await Promise.all([
+        sb.from('habits').select('*').order('created_at'),
+        sb.from('completions').select('task_id, completed_date'),
+      ]);
+      if (he) throw new Error(he.message);
+      if (ce) throw new Error(ce.message);
+      const hs = (habits||[]).map(r => ({
+        id: r.task_id, name: r.name, emoji: r.emoji, color: r.color,
+        days: r.days, start: r.start_date,
+      }));
+      const completions = {};
+      for (const c of (comps||[])) {
+        (completions[c.completed_date] = completions[c.completed_date] || []).push(c.task_id);
+      }
+      return { habits: hs, completions };
+    },
+
+    /* Enregistre les habitudes choisies à l'onboarding */
+    async saveNewHabits(habits) {
+      if (demoMode) { demoData.habits = habits; return; }
+      const { data: { user } } = await sb.auth.getUser();
+      const rows = habits.map(h => ({
+        user_id: user.id, task_id: h.id, name: h.name, emoji: h.emoji,
+        color: h.color, days: h.days, start_date: h.start,
+      }));
+      const { error } = await sb.from('habits').upsert(rows, { onConflict: 'user_id,task_id' });
+      if (error) throw new Error(error.message);
+    },
+
+    /* Coche / décoche une tâche un jour donné */
+    async setCompletion(iso, taskId, done) {
+      if (demoMode) return; // la démo ne persiste rien
+      const { data: { user } } = await sb.auth.getUser();
+      if (done) {
+        await sb.from('completions').upsert(
+          { user_id: user.id, task_id: taskId, completed_date: iso },
+          { onConflict: 'user_id,task_id,completed_date' }
+        );
+      } else {
+        await sb.from('completions').delete()
+          .eq('user_id', user.id).eq('task_id', taskId).eq('completed_date', iso);
+      }
+    },
+  };
+})();
+
+/* Traduit les messages d'erreur Supabase courants en français */
+function traduireErreur(msg) {
+  const m = (msg||'').toLowerCase();
+  if (m.includes('already registered') || m.includes('already exists') || m.includes('user already')) return 'Un compte existe déjà avec cet e-mail.';
+  if (m.includes('invalid login')) return 'E-mail ou mot de passe incorrect.';
+  if (m.includes('password should be') || m.includes('password') && m.includes('least')) return 'Mot de passe : 8 caractères minimum.';
+  if (m.includes('email not confirmed')) return "Ton e-mail n'est pas encore confirmé. Clique le lien reçu par e-mail, puis reconnecte-toi.";
+  if (m.includes('sending') && m.includes('email')) return "L'e-mail de confirmation n'a pas pu être envoyé. Réessaie dans quelques minutes (limite de l'offre gratuite).";
+  if (m.includes('rate limit') || m.includes('too many')) return 'Trop de tentatives. Patiente quelques minutes avant de réessayer.';
+  if (m.includes('signups not allowed') || m.includes('signup is disabled')) return "Les inscriptions sont désactivées côté Supabase. Active-les dans Authentication → Sign In / Providers.";
+  if (m.includes('unable to validate email') || m.includes('invalid format') || m.includes('email address') && m.includes('invalid')) return 'Adresse e-mail invalide.';
+  if (m.includes('failed to fetch') || m.includes('networkerror') || m.includes('load failed')) return 'Connexion au serveur impossible. Vérifie ta connexion internet et réessaie.';
+  return msg || 'Une erreur est survenue.';
 }
 
 /* ============================================================
-   STATS ENGINE
+   APP STATE  (alimenté depuis le Store après connexion)
    ============================================================ */
-function expectedOn(date) { return HABITS.filter(h => h.days.includes(dayIdx(date))); }
+let APP = null;   // { completions, habits }
+function saveData() {}  // remplacé par des écritures ciblées via Store
+
+/* ============================================================
+   STATS ENGINE   (logique d'origine, adaptée au start par habitude)
+   ============================================================ */
+function expectedOn(date) { return HABITS.filter(h => habitActive(h,date)); }
 
 function rangeStats(from, to) {
   let completed=0, expected=0;
-  const start = from < TRACKING_START ? new Date(TRACKING_START) : new Date(from);
+  const gs = globalStart();
+  const start = from < gs ? new Date(gs) : new Date(from);
   let d = new Date(start);
   while (d <= to) {
-    const di = dayIdx(d), done = APP.completions[fmtISO(d)] || [];
-    for (const h of HABITS) if (h.days.includes(di)) { expected++; if (done.includes(h.id)) completed++; }
+    const done = APP.completions[fmtISO(d)] || [];
+    for (const h of HABITS) if (habitActive(h,d)) { expected++; if (done.includes(h.id)) completed++; }
     d = addDays(d,1);
   }
   return { completed, expected, pct: expected ? Math.round((completed/expected)*100) : 0 };
 }
 
 function dayPct(date) {
-  if (beforeStart(date)) return null;
-  const di=dayIdx(date), done=APP.completions[fmtISO(date)]||[]; let c=0,e=0;
-  for (const h of HABITS) if (h.days.includes(di)) { e++; if (done.includes(h.id)) c++; }
+  if (beforeAllStart(date)) return null;
+  const done=APP.completions[fmtISO(date)]||[]; let c=0,e=0;
+  for (const h of HABITS) if (habitActive(h,date)) { e++; if (done.includes(h.id)) c++; }
   return e ? Math.round((c/e)*100) : null;
 }
 
@@ -493,15 +1021,15 @@ function habitMonthStats(habit, year, month) {
   const lastDay = new Date(year,month+1,0).getDate(); let done=0,expected=0;
   for (let d=1; d<=lastDay; d++) {
     const dt = new Date(year,month,d);
-    if (beforeStart(dt) || !habit.days.includes(dayIdx(dt))) continue;
+    if (!habitActive(habit,dt)) continue;
     expected++; if ((APP.completions[fmtISO(dt)]||[]).includes(habit.id)) done++;
   }
   return { done, expected, pct: expected ? Math.round((done/expected)*100) : 0 };
 }
 
 function currentStreak(habit) {
-  let streak=0, d=new Date(today()), guard=0;
-  while (guard++<500 && d>=TRACKING_START) {
+  let streak=0, d=new Date(today()), guard=0, hs=habitStart(habit);
+  while (guard++<800 && d>=hs) {
     if (habit.days.includes(dayIdx(d))) {
       const done=(APP.completions[fmtISO(d)]||[]).includes(habit.id), isT=sameDay(d,today());
       if (done) streak++; else if (!isT) break;
@@ -512,7 +1040,7 @@ function currentStreak(habit) {
 }
 
 function bestStreak(habit) {
-  let best=0, run=0, d=new Date(TRACKING_START);
+  let best=0, run=0, d=new Date(habitStart(habit));
   while (d<=today()) {
     if (habit.days.includes(dayIdx(d))) {
       if ((APP.completions[fmtISO(d)]||[]).includes(habit.id)) { run++; best=Math.max(best,run); } else run=0;
@@ -526,7 +1054,7 @@ function bestStreak(habit) {
    CONFETTI
    ============================================================ */
 function burst() {
-  const cols=[C.red,C.yellow,C.green,C.purple,C.blue,'#ff7a59'];
+  const cols=[C.red,C.yellow,C.green,C.purple,C.blue,C.orange];
   for (let i=0;i<40;i++) {
     const p=document.createElement('div'); p.className='confetti-piece';
     p.style.background=cols[i%cols.length]; p.style.left='50vw'; p.style.top='40vh';
@@ -549,7 +1077,7 @@ function hideTip() { TT.style.display='none'; }
 document.addEventListener('mousemove', e=>{ if(TT.style.display!=='none') moveTip(e); });
 
 /* ============================================================
-   CANVAS CHART HELPERS
+   CANVAS CHART HELPERS  (inchangés)
    ============================================================ */
 function getThemeColors() {
   const cs = getComputedStyle(document.documentElement);
@@ -560,26 +1088,22 @@ function getThemeColors() {
     text: cs.getPropertyValue('--text').trim(),
   };
 }
-
 function drawLineChart(canvasId, labels, datasets, yMax=100) {
   const canvas = document.getElementById(canvasId);
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const W = canvas.parentElement.offsetWidth;
   const H = canvas.parentElement.offsetHeight;
+  if (!W || !H) return;
   canvas.width = W * devicePixelRatio;
   canvas.height = H * devicePixelRatio;
   canvas.style.width = W+'px'; canvas.style.height = H+'px';
   ctx.scale(devicePixelRatio, devicePixelRatio);
-
   const tc = getThemeColors();
   const pad = { t:12, r:12, b:32, l:36 };
   const cw = W - pad.l - pad.r;
   const ch = H - pad.t - pad.b;
-
   ctx.clearRect(0,0,W,H);
-
-  // grid
   const yTicks = [0,25,50,75,100];
   ctx.strokeStyle = tc.grid; ctx.lineWidth = 1;
   for (const y of yTicks) {
@@ -588,14 +1112,11 @@ function drawLineChart(canvasId, labels, datasets, yMax=100) {
     ctx.fillStyle = tc.axis; ctx.font = `10px Poppins,sans-serif`;
     ctx.textAlign = 'right'; ctx.fillText(y, pad.l-5, py+4);
   }
-
   for (const ds of datasets) {
     const pts = ds.data.map((v,i) => ({
       x: pad.l + (labels.length > 1 ? (i/(labels.length-1))*cw : cw/2),
       y: v === null ? null : pad.t + ch - clamp(v,0,yMax)/yMax*ch
     }));
-
-    // fill
     if (ds.fill) {
       const validPts = pts.filter(p=>p.y!==null);
       if (validPts.length > 1) {
@@ -614,8 +1135,6 @@ function drawLineChart(canvasId, labels, datasets, yMax=100) {
         ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
       }
     }
-
-    // line
     ctx.strokeStyle = ds.color; ctx.lineWidth = 2.5;
     ctx.lineJoin = 'round'; ctx.lineCap = 'round';
     ctx.beginPath(); let started=false;
@@ -624,16 +1143,12 @@ function drawLineChart(canvasId, labels, datasets, yMax=100) {
       if (!started) { ctx.moveTo(p.x,p.y); started=true; } else ctx.lineTo(p.x,p.y);
     }
     ctx.stroke();
-
-    // dots
     for (const p of pts) {
       if (p.y===null) continue;
       ctx.beginPath(); ctx.arc(p.x,p.y,3.5,0,Math.PI*2);
       ctx.fillStyle=ds.color; ctx.fill();
     }
   }
-
-  // x labels
   ctx.fillStyle = tc.axis; ctx.font = '10px Poppins,sans-serif'; ctx.textAlign='center';
   const step = labels.length <= 12 ? 1 : Math.ceil(labels.length/10);
   for (let i=0;i<labels.length;i+=step) {
@@ -641,28 +1156,25 @@ function drawLineChart(canvasId, labels, datasets, yMax=100) {
     ctx.fillText(labels[i], x, H-pad.b+16);
   }
 }
-
-function drawBarChart(canvasId, labels, datasets, horizontal=false) {
+function drawBarChart(canvasId, labels, datasets) {
   const canvas = document.getElementById(canvasId);
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const W = canvas.parentElement.offsetWidth;
   const H = canvas.parentElement.offsetHeight;
+  if (!W || !H) return;
   canvas.width = W*devicePixelRatio; canvas.height = H*devicePixelRatio;
   canvas.style.width=W+'px'; canvas.style.height=H+'px';
   ctx.scale(devicePixelRatio, devicePixelRatio);
   const tc = getThemeColors();
   ctx.clearRect(0,0,W,H);
-
   const pad = { t:12, r:12, b:36, l:38 };
   const cw = W-pad.l-pad.r, ch = H-pad.t-pad.b;
   const nGroups = labels.length, nBars = datasets.length;
   const groupW = cw/nGroups;
   const barW = Math.min((groupW*0.7)/nBars, 32);
-  const maxVal = Math.max(...datasets.flatMap(d=>d.data.filter(v=>v!==null)));
+  const maxVal = Math.max(1, ...datasets.flatMap(d=>d.data.filter(v=>v!==null)));
   const yMax = Math.ceil(maxVal/5)*5 || 10;
-
-  // grid
   ctx.strokeStyle=tc.grid; ctx.lineWidth=1;
   for (let t=0; t<=4; t++) {
     const val = (t/4)*yMax;
@@ -671,8 +1183,6 @@ function drawBarChart(canvasId, labels, datasets, horizontal=false) {
     ctx.fillStyle=tc.axis; ctx.font='10px Poppins,sans-serif'; ctx.textAlign='right';
     ctx.fillText(Math.round(val), pad.l-5, py+4);
   }
-
-  // bars
   for (let gi=0; gi<nGroups; gi++) {
     const cx = pad.l + gi*groupW + groupW/2;
     const totalW = nBars*barW + (nBars-1)*4;
@@ -691,7 +1201,6 @@ function drawBarChart(canvasId, labels, datasets, horizontal=false) {
       ctx.quadraticCurveTo(bx,by,bx+r,by);
       ctx.closePath(); ctx.fill();
     }
-    // x label
     ctx.fillStyle=tc.axis; ctx.font='13px Poppins,sans-serif'; ctx.textAlign='center';
     ctx.fillText(labels[gi], cx, H-pad.b+16);
   }
@@ -706,20 +1215,34 @@ let monthState = { y: today().getFullYear(), m: today().getMonth() };
 let yearState = today().getFullYear();
 
 /* ============================================================
-   NAVIGATION
+   NAVIGATION (sidebar + mobile)
    ============================================================ */
+function switchView(v, label) {
+  currentView = v;
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.view===v));
+  document.querySelectorAll('.mnav-btn').forEach(b=>b.classList.toggle('active', b.dataset.view===v));
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  document.getElementById('topbar-title').textContent = label || v;
+  document.getElementById('content').scrollTop = 0;
+  renderCurrentView();
+}
 document.querySelectorAll('.nav-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    const v = btn.dataset.view;
-    currentView = v;
-    document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
-    document.getElementById('view-'+v).classList.add('active');
-    document.getElementById('topbar-title').textContent = btn.textContent.trim();
-    renderCurrentView();
-  });
+  btn.addEventListener('click', () => switchView(btn.dataset.view, btn.textContent.trim()));
 });
+document.querySelectorAll('.mnav-btn[data-view]').forEach(btn => {
+  btn.addEventListener('click', () => switchView(btn.dataset.view, btn.dataset.label || btn.dataset.view));
+});
+
+/* ── Barre mobile : affichage piloté par JS (fiable sur tous les téléphones) ── */
+const NAV_MQ = window.matchMedia('(max-width:760px)');
+function updateMobileNav() {
+  const show = NAV_MQ.matches && document.body.classList.contains('app-active');
+  document.getElementById('mobile-nav').classList.toggle('show', show);
+}
+if (NAV_MQ.addEventListener) NAV_MQ.addEventListener('change', updateMobileNav);
+else NAV_MQ.addListener(updateMobileNav); // anciens navigateurs
+window.addEventListener('resize', updateMobileNav);
 
 /* ============================================================
    TOPBAR DATE + CHIP
@@ -729,8 +1252,7 @@ function updateTopbar() {
   document.getElementById('topbar-date').textContent =
     DAY_NAMES[dayIdx(T)] + ' ' + T.getDate() + ' ' + MONTH_NAMES[T.getMonth()] + ' ' + T.getFullYear();
   const s = rangeStats(T, T);
-  const chip = document.getElementById('today-chip-txt');
-  chip.textContent = `Aujourd'hui · ${s.pct}%`;
+  document.getElementById('today-chip-txt').textContent = `Aujourd'hui · ${s.pct}%`;
 }
 
 /* ============================================================
@@ -758,31 +1280,27 @@ function renderWeekly() {
   const monday = addDays(mondayOf(T), weekOffset*7);
   const days = Array.from({length:7}, (_,i) => addDays(monday,i));
   const weekStats = rangeStats(days[0], days[6]);
-
-  // subtitle
   const lbl = weekOffset===0 ? `Semaine du ${days[0].getDate()} au ${days[6].getDate()} ${MONTH_SHORT[days[6].getMonth()]} ${days[6].getFullYear()}`
     : `${days[0].getDate()} ${MONTH_SHORT[days[0].getMonth()]} – ${days[6].getDate()} ${MONTH_SHORT[days[6].getMonth()]}`;
   document.getElementById('week-subtitle').textContent = lbl;
-
-  // progress
   document.getElementById('week-pct-label').textContent = `${weekStats.pct}% · ${weekStats.completed}/${weekStats.expected}`;
   document.getElementById('week-prog').style.width = weekStats.pct + '%';
   document.getElementById('week-next').disabled = weekOffset >= 0;
 
-  // TODAY LIST
   const isCurrentWeek = weekOffset === 0;
-  const refDay = isCurrentWeek ? T : days[0]; // show monday's habits if past week
-  const displayDay = isCurrentWeek ? T : days.find(d=>!beforeStart(d)&&d<=T) || T;
+  const displayDay = isCurrentWeek ? T : (days.find(d=>!beforeAllStart(d)&&d<=T) || days[0]);
   const todayHabits = expectedOn(displayDay);
   const todayDone = APP.completions[fmtISO(displayDay)] || [];
 
   const list = document.getElementById('today-list');
   list.innerHTML = '';
+  if (!todayHabits.length) {
+    list.innerHTML = `<div class="empty-note">Aucune habitude prévue ce jour-là. Profite-en ! 🌿</div>`;
+  }
   for (const h of todayHabits) {
     const done = todayDone.includes(h.id);
     const btn = document.createElement('button');
     btn.className = 'today-item' + (done?' done':'');
-    btn.style.width = '100%';
     btn.innerHTML = `
       <span class="ti-check">${done?'✓':''}</span>
       <span class="ti-emoji">${h.emoji}</span>
@@ -790,13 +1308,10 @@ function renderWeekly() {
       <span class="ti-tag">${done?'Fait':'À faire'}</span>`;
     const isFuture = displayDay > T;
     btn.disabled = isFuture;
-    if (!isFuture) {
-      btn.addEventListener('click', () => toggleHabit(fmtISO(displayDay), h.id));
-    }
+    if (!isFuture) btn.addEventListener('click', () => toggleHabit(fmtISO(displayDay), h.id));
     list.appendChild(btn);
   }
 
-  // WEEK GRID
   const table = document.getElementById('week-grid');
   let html = '<thead><tr><th class="gm-th-corner"></th>';
   days.forEach((d,i) => {
@@ -808,7 +1323,7 @@ function renderWeekly() {
     html += `<tr><td class="gm-habit-cell">${h.emoji} ${h.name}</td>`;
     for (const d of days) {
       const sched = h.days.includes(dayIdx(d));
-      const isFuture = d > T, isBefore = beforeStart(d);
+      const isFuture = d > T, isBefore = d < habitStart(h);
       const done = (APP.completions[fmtISO(d)]||[]).includes(h.id);
       if (!sched) {
         html += `<td class="gm-tile-cell"><button class="gm-tile inactive" disabled>·</button></td>`;
@@ -846,7 +1361,6 @@ function renderMonthly() {
   document.getElementById('month-title').textContent = MONTH_NAMES[m] + ' ' + y;
   document.getElementById('month-next').disabled = isCurrent;
 
-  // STAT CARDS
   const sc = document.getElementById('month-stat-cards');
   const heroGrad = `linear-gradient(135deg, ${C.yellow}, ${rygColor(stats.pct)})`;
   sc.innerHTML = `
@@ -872,25 +1386,21 @@ function renderMonthly() {
       <div class="sc-sub">de complétion</div>
     </div>`;
 
-  // DAILY CHART
   const dailyLabels = [], dailyData = [];
   for (let d=1; d<=lastDay; d++) {
     dailyLabels.push(d);
     const dt = new Date(y,m,d);
     dailyData.push(dt > T ? null : dayPct(dt));
   }
-  requestAnimationFrame(() => {
-    drawLineChart('chart-daily', dailyLabels, [{ data:dailyData, color:C.green, fill:C.green }]);
-  });
+  requestAnimationFrame(() => drawLineChart('chart-daily', dailyLabels, [{ data:dailyData, color:C.green, fill:C.green }]));
 
-  // CALENDAR
   const grid = document.getElementById('cal-grid');
   grid.innerHTML = '';
   const leadPad = dayIdx(first);
-  for (let i=0; i<leadPad; i++) { const e=document.createElement('div'); grid.appendChild(e); }
+  for (let i=0; i<leadPad; i++) grid.appendChild(document.createElement('div'));
   for (let d=1; d<=lastDay; d++) {
     const dt = new Date(y,m,d);
-    const isFuture = dt > T, isBefore = beforeStart(dt);
+    const isFuture = dt > T, isBefore = beforeAllStart(dt);
     const pct = (isFuture || isBefore) ? null : dayPct(dt);
     const bg = (isFuture || isBefore) ? 'var(--track)' : (rygColor(pct) || 'var(--track)');
     const textColor = pct===null ? 'var(--faint)' : (pct>50?'#fff':C.ink);
@@ -899,14 +1409,13 @@ function renderMonthly() {
     cell.style.background = bg;
     cell.style.opacity = (isFuture || isBefore) ? '.4' : '1';
     cell.innerHTML = `<span class="cal-cell-num" style="color:${textColor}">${d}</span>`;
-    if (!isFuture && !isBefore) {
+    if (!isFuture && !isBefore && pct!==null) {
       cell.addEventListener('mouseenter', e => showTip(e, `<strong>${d} ${MONTH_SHORT[m]}</strong><br>Complétion : ${pct}%`));
       cell.addEventListener('mouseleave', hideTip);
     }
     grid.appendChild(cell);
   }
 
-  // HABIT BARS
   const hbContainer = document.getElementById('habit-bars');
   const perHabit = HABITS.map(h => ({ h, ...habitMonthStats(h,y,m), streak:currentStreak(h) })).sort((a,b)=>b.pct-a.pct);
   hbContainer.innerHTML = perHabit.map(({h,done,expected,pct,streak}) => `
@@ -925,21 +1434,21 @@ function renderAnnual() {
   document.getElementById('year-label').textContent = yearState;
   document.getElementById('year-title').textContent = 'Bilan ' + yearState;
   document.getElementById('year-next').disabled = yearState >= T.getFullYear();
+  const gs = globalStart();
 
   const monthly = Array.from({length:12}, (_,m) => {
     const first = new Date(yearState,m,1), last = new Date(yearState,m+1,0);
     const to = last > T ? T : last;
-    if (first > T || last < TRACKING_START) return { m, pct:null };
+    if (first > T || last < gs) return { m, pct:null };
     return { m, pct: rangeStats(first,to).pct };
   });
   const valid = monthly.filter(x=>x.pct!==null&&x.pct>=0);
   const best = valid.length ? valid.reduce((a,b)=>b.pct>a.pct?b:a) : null;
   const avg = valid.length ? Math.round(valid.reduce((s,x)=>s+x.pct,0)/valid.length) : 0;
   const habitYear = HABITS.map(h => { let d=0,e=0; for(let m=0;m<12;m++){const s=habitMonthStats(h,yearState,m);d+=s.done;e+=s.expected;} return{h,pct:e?Math.round((d/e)*100):0}; });
-  const bh = habitYear.reduce((a,b)=>b.pct>a.pct?b:a);
-  const wh = habitYear.reduce((a,b)=>b.pct<a.pct?b:a);
+  const bh = habitYear.length ? habitYear.reduce((a,b)=>b.pct>a.pct?b:a) : {h:{emoji:'—',name:'—'},pct:0};
+  const wh = habitYear.length ? habitYear.reduce((a,b)=>b.pct<a.pct?b:a) : {h:{emoji:'—',name:'—'},pct:0};
 
-  // STAT CARDS
   document.getElementById('annual-stat-cards').innerHTML = `
     <div class="stat-card" style="border-top:3px solid ${C.purple}">
       <div class="sc-label">Meilleur mois</div>
@@ -962,12 +1471,8 @@ function renderAnnual() {
       <div class="sc-sub">${wh.h.name} · ${wh.pct}%</div>
     </div>`;
 
-  // ANNUAL LINE CHART
-  requestAnimationFrame(() => {
-    drawLineChart('chart-annual', MONTH_SHORT, [{ data:monthly.map(x=>x.pct), color:C.green, fill:C.green }]);
-  });
+  requestAnimationFrame(() => drawLineChart('chart-annual', MONTH_SHORT, [{ data:monthly.map(x=>x.pct), color:C.green, fill:C.green }]));
 
-  // MINI MONTHS
   const mm = document.getElementById('mini-months');
   mm.innerHTML = '';
   for (let mo=0; mo<12; mo++) {
@@ -982,8 +1487,8 @@ function renderAnnual() {
       cell.className = 'mini-cell';
       if (c===null) { cell.style.background='transparent'; }
       else {
-        const d=new Date(yearState,mo,c), pct=d>T||beforeStart(d)?null:dayPct(d);
-        cell.style.background = d>T||beforeStart(d) ? (document.documentElement.dataset.theme==='light'?'rgba(24,27,52,.05)':'rgba(255,255,255,.05)') : (rygColor(pct)||'var(--track)');
+        const d=new Date(yearState,mo,c), pct=(d>T||beforeAllStart(d))?null:dayPct(d);
+        cell.style.background = (d>T||beforeAllStart(d)) ? (document.documentElement.dataset.theme==='light'?'rgba(24,27,52,.05)':'rgba(255,255,255,.05)') : (rygColor(pct)||'var(--track)');
         cell.addEventListener('mouseenter', e => showTip(e, `<strong>${c} ${MONTH_SHORT[mo]}</strong><br>${pct!==null?pct+'%':'—'}`));
         cell.addEventListener('mouseleave', hideTip);
       }
@@ -997,11 +1502,13 @@ function renderAnnual() {
    ============================================================ */
 function renderStreaks() {
   const T = today();
+  const gs = globalStart();
   let perfectWeeks=0;
-  let m=new Date(TRACKING_START);
+  let m=new Date(gs);
   while (m<=T) { const s=rangeStats(m,addDays(m,6)); if(s.expected>0&&s.pct===100)perfectWeeks++; m=addDays(m,7); }
-  const totalDays=Math.round((T-TRACKING_START)/86400000)+1;
+  const totalDays=Math.max(0, Math.round((T-gs)/86400000)+1);
   const totalComp=Object.values(APP.completions).reduce((s,a)=>s+a.length,0);
+  const startLabel = `${gs.getDate()} ${MONTH_SHORT[gs.getMonth()]}`;
 
   document.getElementById('streak-global-cards').innerHTML = `
     <div class="stat-card" style="border-top:3px solid ${C.purple}">
@@ -1012,7 +1519,7 @@ function renderStreaks() {
     <div class="stat-card" style="border-top:3px solid ${C.green}">
       <div class="sc-label">Jours suivis</div>
       <div class="sc-value" style="color:${C.green}">${totalDays}</div>
-      <div class="sc-sub">depuis le 17 mai</div>
+      <div class="sc-sub">depuis le ${startLabel}</div>
     </div>
     <div class="stat-card" style="border-top:3px solid ${C.yellow}">
       <div class="sc-label">Total complétions</div>
@@ -1021,7 +1528,6 @@ function renderStreaks() {
     </div>`;
 
   const rows = HABITS.map(h => ({ h, current:currentStreak(h), best:bestStreak(h), total:Object.values(APP.completions).filter(a=>a.includes(h.id)).length }));
-
   document.getElementById('streak-habit-cards').innerHTML = rows.map(r => `
     <div class="streak-card">
       <div class="sk-head"><span class="sk-emoji">${r.h.emoji}</span><span class="sk-name">${r.h.name}</span></div>
@@ -1032,12 +1538,10 @@ function renderStreaks() {
       </div>
     </div>`).join('');
 
-  requestAnimationFrame(() => {
-    drawBarChart('chart-streaks', rows.map(r=>r.h.emoji), [
-      { data:rows.map(r=>r.current), color:C.red },
-      { data:rows.map(r=>r.best),    color:C.green },
-    ]);
-  });
+  requestAnimationFrame(() => drawBarChart('chart-streaks', rows.map(r=>r.h.emoji), [
+    { data:rows.map(r=>r.current), color:C.red },
+    { data:rows.map(r=>r.best),    color:C.green },
+  ]));
 }
 
 /* ============================================================
@@ -1047,19 +1551,19 @@ function toggleHabit(iso, habitId) {
   if (!APP.completions[iso]) APP.completions[iso] = [];
   const arr = APP.completions[iso];
   const idx = arr.indexOf(habitId);
+  const nowDone = idx < 0;               // true = on vient de cocher
   if (idx >= 0) arr.splice(idx, 1); else arr.push(habitId);
   if (!arr.length) delete APP.completions[iso];
-
-  // confetti if day complete
-  const dt = new Date(iso+'T00:00:00');
+  const dt = parseISO(iso);
   const need = expectedOn(dt).map(h=>h.id);
   const done = new Set(APP.completions[iso]||[]);
   if (need.length && need.every(id=>done.has(id))) setTimeout(burst, 30);
-
-  saveData();
+  // affichage instantané
   updateTopbar();
   updateSidebarScore();
   renderCurrentView();
+  // écriture en base en arrière-plan (sauf en mode démo)
+  Store.setCompletion(iso, habitId, nowDone).catch(err => console.warn('Sauvegarde:', err.message));
 }
 
 /* ============================================================
@@ -1067,62 +1571,362 @@ function toggleHabit(iso, habitId) {
    ============================================================ */
 document.getElementById('week-prev').addEventListener('click', () => { weekOffset--; renderWeekly(); });
 document.getElementById('week-next').addEventListener('click', () => { weekOffset=Math.min(0,weekOffset+1); renderWeekly(); });
-
-document.getElementById('month-prev').addEventListener('click', () => {
-  const d=new Date(monthState.y,monthState.m-1,1); monthState={y:d.getFullYear(),m:d.getMonth()}; renderMonthly();
-});
+document.getElementById('month-prev').addEventListener('click', () => { const d=new Date(monthState.y,monthState.m-1,1); monthState={y:d.getFullYear(),m:d.getMonth()}; renderMonthly(); });
 document.getElementById('month-next').addEventListener('click', () => {
-  const d=new Date(monthState.y,monthState.m+1,1);
-  const T=today();
+  const d=new Date(monthState.y,monthState.m+1,1), T=today();
   if (d<=new Date(T.getFullYear(),T.getMonth(),1)) { monthState={y:d.getFullYear(),m:d.getMonth()}; renderMonthly(); }
 });
-
 document.getElementById('year-prev').addEventListener('click', () => { yearState--; renderAnnual(); });
 document.getElementById('year-next').addEventListener('click', () => { const T=today(); yearState=Math.min(T.getFullYear(),yearState+1); renderAnnual(); });
 
 /* ============================================================
-   THEME TOGGLE
+   THEME TOGGLE  (sidebar + bouton mobile)
    ============================================================ */
 let isDark = true;
-document.getElementById('theme-btn').addEventListener('click', () => {
-  isDark = !isDark;
+function applyTheme() {
   document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
   document.getElementById('theme-label').textContent = isDark ? 'Mode clair' : 'Mode sombre';
-  const icon = document.getElementById('theme-icon');
-  icon.innerHTML = isDark
-    ? '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'
-    : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+  const sun = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+  const moon = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+  document.getElementById('theme-icon').innerHTML = isDark ? sun : moon;
+  document.getElementById('theme-icon-m').innerHTML = isDark ? sun : moon;
   try { localStorage.setItem('todogrowth_theme', isDark?'dark':'light'); } catch(e){}
-  renderCurrentView();
-});
+}
+function toggleTheme() { isDark = !isDark; applyTheme(); renderCurrentView(); }
+document.getElementById('theme-btn').addEventListener('click', toggleTheme);
+document.getElementById('theme-btn-m').addEventListener('click', toggleTheme);
 
 /* ============================================================
    RENDER DISPATCH
    ============================================================ */
 function renderCurrentView() {
+  if (!APP) return;
   if (currentView==='weekly')  renderWeekly();
   if (currentView==='monthly') renderMonthly();
   if (currentView==='annual')  renderAnnual();
   if (currentView==='streaks') renderStreaks();
 }
+let resizeTimer;
+window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(renderCurrentView, 150); });
 
 /* ============================================================
-   RESIZE REDRAW
+   WEEKLY SUMMARY  (résumé hebdo — aperçu en app ; en prod = e-mail dimanche)
    ============================================================ */
-let resizeTimer;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(renderCurrentView, 150);
+function buildSummaryHTML() {
+  const T = today();
+  // semaine écoulée (lundi -> dimanche de la semaine courante)
+  const monday = mondayOf(T);
+  const sunday = addDays(monday,6);
+  const s = rangeStats(monday, sunday > T ? T : sunday);
+  const sl = scoreLabel(s.pct);
+  const perHabit = HABITS.map(h => {
+    let done=0,exp=0; let d=new Date(monday);
+    while (d<=sunday && d<=T) { if (habitActive(h,d)) { exp++; if((APP.completions[fmtISO(d)]||[]).includes(h.id)) done++; } d=addDays(d,1); }
+    return { h, done, exp, pct: exp?Math.round(done/exp*100):null };
+  }).filter(x=>x.exp>0).sort((a,b)=>b.pct-a.pct);
+
+  const top = perHabit[0], low = perHabit[perHabit.length-1];
+  let msg;
+  if (s.pct>=90) msg = `Semaine <b>exceptionnelle</b> 🏆 Tu es à ${s.pct}%. Continue exactement comme ça !`;
+  else if (s.pct>=70) msg = `Belle semaine à <b>${s.pct}%</b>. ${top?`Ton point fort : <b>${top.h.name}</b>.`:''} ${low&&low.pct<70?`À soigner : <b>${low.h.name}</b>.`:''}`;
+  else if (s.pct>=40) msg = `Semaine à <b>${s.pct}%</b>. ${low?`Concentre-toi sur <b>${low.h.name}</b> la semaine prochaine`:'Un petit coup de boost pour la semaine prochaine'} 💪`;
+  else msg = `Semaine difficile à <b>${s.pct}%</b>. Pas grave — on repart à zéro lundi. Choisis <b>une</b> habitude à tenir coûte que coûte.`;
+
+  const rows = perHabit.map(x => `
+    <div class="sum-row">
+      <span class="sr-emoji">${x.h.emoji}</span>
+      <span class="sr-name">${x.h.name}</span>
+      <span class="sr-val" style="color:${rygColor(x.pct)}">${x.pct}% · ${x.done}/${x.exp}</span>
+    </div>`).join('') || `<div class="empty-note">Pas encore de données cette semaine.</div>`;
+
+  return `
+    <div class="summary-card">
+      <div class="sum-head"><span class="sum-icon">📊</span><span class="sum-title">Ton résumé de la semaine</span></div>
+      <div class="sum-period">Semaine du ${monday.getDate()} au ${sunday.getDate()} ${MONTH_SHORT[sunday.getMonth()]} ${sunday.getFullYear()}</div>
+      <div class="sum-hero" style="background:linear-gradient(135deg, ${C.yellow}, ${rygColor(s.pct)})">
+        <div class="hero-circle"></div>
+        <div class="sum-hero-label">Score de la semaine</div>
+        <div class="sum-hero-val">${s.pct}<span style="font-size:22px">%</span></div>
+        <div class="sum-hero-badge">${sl.label} · ${s.completed}/${s.expected} tâches</div>
+      </div>
+      <div class="sum-rows">${rows}</div>
+      <div class="sum-msg">${msg}</div>
+      <button class="btn-primary" id="sum-close" style="margin-top:0">Compris, on continue 🚀</button>
+    </div>`;
+}
+function openSummary() {
+  const ov = document.createElement('div');
+  ov.id = 'summary-overlay';
+  ov.innerHTML = buildSummaryHTML();
+  document.body.appendChild(ov);
+  ov.addEventListener('click', e => { if (e.target===ov) ov.remove(); });
+  ov.querySelector('#sum-close').addEventListener('click', () => ov.remove());
+}
+document.getElementById('summary-btn').addEventListener('click', openSummary);
+
+/* ============================================================
+   ONBOARDING LOGIC
+   ============================================================ */
+let onbSelected = new Set();
+let onbConfig = {};  // id -> { days:[], start:'YYYY-MM-DD' }
+
+function renderTaskLibrary() {
+  const wrap = document.getElementById('task-library');
+  wrap.innerHTML = TASK_LIBRARY.map(cat => `
+    <div class="cat-block">
+      <div class="cat-head">${cat.cat}</div>
+      <div class="task-grid">
+        ${cat.tasks.map(t => `
+          <div class="task-chip${onbSelected.has(t.id)?' sel':''}" data-id="${t.id}">
+            <span class="tc-emoji">${t.emoji}</span>
+            <span class="tc-name">${t.name}</span>
+            <span class="tc-check">${onbSelected.has(t.id)?'✓':''}</span>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+  wrap.querySelectorAll('.task-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const id = chip.dataset.id;
+      if (onbSelected.has(id)) onbSelected.delete(id); else onbSelected.add(id);
+      chip.classList.toggle('sel');
+      chip.querySelector('.tc-check').textContent = onbSelected.has(id) ? '✓' : '';
+      updateSelCount();
+    });
+  });
+  updateSelCount();
+}
+function updateSelCount() {
+  const n = onbSelected.size;
+  document.getElementById('sel-count').textContent = n + (n>1?' tâches sélectionnées':' tâche sélectionnée');
+  document.getElementById('btn-to-step2').disabled = n===0;
+  document.getElementById('btn-to-step2').style.opacity = n===0 ? .5 : 1;
+}
+function renderTaskConfig() {
+  const wrap = document.getElementById('task-config');
+  const todayISO = fmtISO(today());
+  wrap.innerHTML = [...onbSelected].map(id => {
+    const t = TASK_BY_ID[id];
+    const cfg = onbConfig[id] || (onbConfig[id] = { days:[0,1,2,3,4], start:todayISO });
+    return `
+      <div class="cfg-row" data-id="${id}">
+        <div class="cfg-top">
+          <span class="cfg-emoji">${t.emoji}</span>
+          <span class="cfg-name">${t.name}</span>
+          <span class="cfg-freq" id="freq-${id}">${cfg.days.length} j / sem.</span>
+        </div>
+        <div class="cfg-grid">
+          <div>
+            <span class="cfg-lbl">Jours concernés</span>
+            <div class="days-row">
+              ${DAY_SHORT.map((d,i)=>`<button class="day-toggle${cfg.days.includes(i)?' on':''}" data-day="${i}">${d}</button>`).join('')}
+            </div>
+          </div>
+          <div class="cfg-date">
+            <span class="cfg-lbl">Date de démarrage</span>
+            <input type="date" value="${cfg.start}" max="${todayISO}"/>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  wrap.querySelectorAll('.cfg-row').forEach(row => {
+    const id = row.dataset.id;
+    row.querySelectorAll('.day-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const di = +btn.dataset.day;
+        const days = onbConfig[id].days;
+        const idx = days.indexOf(di);
+        if (idx>=0) days.splice(idx,1); else days.push(di);
+        btn.classList.toggle('on');
+        document.getElementById('freq-'+id).textContent = days.length + ' j / sem.';
+      });
+    });
+    row.querySelector('input[type=date]').addEventListener('change', e => {
+      onbConfig[id].start = e.target.value || todayISO;
+    });
+  });
+}
+
+document.getElementById('btn-to-step2').addEventListener('click', () => {
+  if (!onbSelected.size) return;
+  document.getElementById('onb-step-1').classList.add('hidden');
+  document.getElementById('onb-step-2').classList.remove('hidden');
+  document.getElementById('dot-1').classList.replace('active','done');
+  document.getElementById('dot-1').textContent='✓';
+  document.getElementById('dot-2').classList.add('active');
+  renderTaskConfig();
 });
+document.getElementById('btn-back-step1').addEventListener('click', () => {
+  document.getElementById('onb-step-2').classList.add('hidden');
+  document.getElementById('onb-step-1').classList.remove('hidden');
+  document.getElementById('dot-1').classList.replace('done','active');
+  document.getElementById('dot-1').textContent='1';
+  document.getElementById('dot-2').classList.remove('active');
+});
+document.getElementById('btn-finish').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-finish');
+  btn.disabled = true; const old = btn.textContent; btn.textContent = 'Création…';
+  // construire les habitudes de l'utilisateur
+  const habits = [...onbSelected].map((id,i) => {
+    const t = TASK_BY_ID[id];
+    const cfg = onbConfig[id] || { days:[0,1,2,3,4], start:fmtISO(today()) };
+    const days = cfg.days.length ? [...cfg.days].sort((a,b)=>a-b) : [0,1,2,3,4];
+    return { id, name:t.name, emoji:t.emoji, color:PALETTE[i%PALETTE.length], days, start:cfg.start };
+  });
+  try {
+    await Store.saveNewHabits(habits);
+    await enterApp();
+  } catch(e) {
+    btn.disabled = false; btn.textContent = old;
+    alert('Impossible d\'enregistrer tes tâches : ' + e.message);
+  }
+});
+
+/* ============================================================
+   AUTH UI
+   ============================================================ */
+document.getElementById('tab-login').addEventListener('click', () => {
+  document.getElementById('tab-login').classList.add('active');
+  document.getElementById('tab-signup').classList.remove('active');
+  document.getElementById('form-login').classList.remove('hidden');
+  document.getElementById('form-signup').classList.add('hidden');
+});
+document.getElementById('tab-signup').addEventListener('click', () => {
+  document.getElementById('tab-signup').classList.add('active');
+  document.getElementById('tab-login').classList.remove('active');
+  document.getElementById('form-signup').classList.remove('hidden');
+  document.getElementById('form-login').classList.add('hidden');
+});
+
+document.getElementById('btn-login').addEventListener('click', async () => {
+  const err = document.getElementById('login-err'); err.textContent='';
+  const btn = document.getElementById('btn-login'); btn.disabled = true; const old = btn.textContent; btn.textContent = 'Connexion…';
+  const stay = document.getElementById('stay-logged').checked;
+  Store.setPersistence(stay);
+  try {
+    await Store.logIn(document.getElementById('login-email').value, document.getElementById('login-pass').value);
+    await routeAfterAuth();
+  } catch(e) { err.textContent = e.message; }
+  btn.disabled = false; btn.textContent = old;
+});
+document.getElementById('btn-demo').addEventListener('click', async () => {
+  Store.logInDemo();
+  await enterApp();
+});
+
+document.getElementById('btn-signup').addEventListener('click', async () => {
+  const err = document.getElementById('su-err'); err.textContent='';
+  const email = document.getElementById('su-email').value.trim();
+  const phone = document.getElementById('su-phone').value.trim();
+  const p1 = document.getElementById('su-pass').value;
+  const p2 = document.getElementById('su-pass2').value;
+  if (!email || !/.+@.+\..+/.test(email)) { err.textContent='Adresse e-mail invalide.'; return; }
+  if (!phone) { err.textContent='Le téléphone est requis.'; return; }
+  if (p1.length < 8) { err.textContent='Mot de passe : 8 caractères minimum.'; return; }
+  if (p1 !== p2) { err.textContent='Les mots de passe ne correspondent pas.'; return; }
+  const btn = document.getElementById('btn-signup'); btn.disabled = true; const old = btn.textContent; btn.textContent = 'Création…';
+  Store.setPersistence(true);
+  try {
+    await Store.signUp(email, phone, p1);
+    // Selon la config Supabase, le compte peut nécessiter une confirmation par e-mail.
+    const session = await Store.currentSession();
+    if (!session) {
+      err.style.color = 'var(--green)';
+      err.textContent = 'Compte créé ! Vérifie ta boîte mail pour confirmer, puis connecte-toi.';
+      btn.disabled = false; btn.textContent = old;
+      return;
+    }
+    startOnboarding();
+  } catch(e) { err.textContent = e.message; }
+  btn.disabled = false; btn.textContent = old;
+});
+
+/* Après connexion : onboarding si aucune habitude, sinon dashboard */
+async function routeAfterAuth() {
+  const data = await Store.loadAll();
+  if (!data.habits || !data.habits.length) startOnboarding();
+  else await enterApp();
+}
+
+/* ============================================================
+   SCREEN TRANSITIONS
+   ============================================================ */
+function startOnboarding() {
+  onbSelected = new Set(); onbConfig = {};
+  document.getElementById('onb-step-1').classList.remove('hidden');
+  document.getElementById('onb-step-2').classList.add('hidden');
+  document.getElementById('dot-1').className='onb-step-dot active'; document.getElementById('dot-1').textContent='1';
+  document.getElementById('dot-2').className='onb-step-dot';
+  renderTaskLibrary();
+  document.getElementById('auth-screen').classList.add('hidden');
+  document.getElementById('onboarding-screen').classList.remove('hidden');
+}
+
+async function logout() {
+  await Store.logOut();
+  APP = null; HABITS = [];
+  document.body.classList.remove('app-active');
+  updateMobileNav();
+  document.getElementById('app-shell').classList.add('hidden');
+  document.getElementById('onboarding-screen').classList.add('hidden');
+  document.getElementById('auth-screen').classList.remove('hidden');
+  document.getElementById('login-pass').value='';
+}
+document.getElementById('logout-btn').addEventListener('click', logout);
+document.getElementById('mnav-logout').addEventListener('click', logout);
+
+async function enterApp() {
+  const data = await Store.loadAll();
+  HABITS = (data.habits||[]).map(h => ({ ...h, _start: parseISO(h.start) }));
+  APP = { completions: data.completions || {}, habits: data.habits || [] };
+
+  document.getElementById('auth-screen').classList.add('hidden');
+  document.getElementById('onboarding-screen').classList.add('hidden');
+  document.getElementById('app-shell').classList.remove('hidden');
+  document.body.classList.add('app-active');
+  updateMobileNav();
+
+  // reset vues
+  weekOffset = 0;
+  monthState = { y: today().getFullYear(), m: today().getMonth() };
+  yearState = today().getFullYear();
+
+  updateTopbar();
+  updateSidebarScore();
+  switchView('weekly', 'Vue hebdo');
+
+  // résumé hebdo : s'ouvre automatiquement le dimanche
+  if (today().getDay() === 0) setTimeout(openSummary, 600);
+}
 
 /* ============================================================
    INIT
    ============================================================ */
-APP = loadData();
-try { const t=localStorage.getItem('todogrowth_theme'); if(t==='light'){isDark=false;document.documentElement.dataset.theme='light';document.getElementById('theme-label').textContent='Mode sombre';} } catch(e){}
-updateTopbar();
-updateSidebarScore();
-renderWeekly();
+try { const t=localStorage.getItem('todogrowth_theme'); if(t==='light') isDark=false; } catch(e){}
+applyTheme();
+updateMobileNav();
+
+(async () => {
+  try {
+    await initSupabase();
+  } catch(e) {
+    // Réseau/SDK indisponible : on laisse l'écran de connexion,
+    // le bouton "démo" reste utilisable (100% local).
+    const err = document.getElementById('login-err');
+    if (err) err.textContent = 'Connexion au serveur impossible. Le mode démo reste disponible.';
+    console.warn('Supabase non chargé :', e.message);
+    return;
+  }
+  // Auto-connexion si une session valide existe (et "rester connecté" actif)
+  let noPersist = false;
+  try { noPersist = sessionStorage.getItem('todogrowth_no_persist') === '1'; } catch(e){}
+  const session = await Store.currentSession();
+  if (session && !noPersist) {
+    await routeAfterAuth();
+  } else if (session && noPersist) {
+    await Store.logOut();
+  }
+})();
 </script>
 </body>
 </html>
