@@ -48,7 +48,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font
 /* ════════════════════════════════════════════════════════════
    AUTH SCREEN  (login / signup)
    ════════════════════════════════════════════════════════════ */
-#auth-screen,#onboarding-screen{
+#auth-screen,#onboarding-screen,#pwa-screen{
   position:fixed;inset:0;z-index:200;background:var(--bg);
   display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;
   padding:40px 18px;
@@ -329,10 +329,115 @@ canvas{display:block}
 .mnav-btn.active svg{opacity:1}
 
 /* ════════════════════════════════════════════════════════════
+   ✦ NOUVEAU — ÉCRAN "INSTALLER L'APP" (PWA)
+   ════════════════════════════════════════════════════════════ */
+.pwa-card{width:100%;max-width:680px;margin:auto;background:var(--card);border:1px solid var(--border);border-radius:22px;padding:28px 28px 24px;box-shadow:var(--shadow);animation:fadeUp .4s ease}
+.pwa-badge{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--green);background:rgba(0,210,135,.12);border:1px solid rgba(0,210,135,.25);padding:6px 12px;border-radius:999px;margin-bottom:14px}
+.pwa-title{font-size:24px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px}
+.pwa-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.55}
+.pwa-os-tabs{display:flex;background:var(--card2);border:1px solid var(--border);border-radius:13px;padding:4px;margin-bottom:20px;max-width:320px}
+.pwa-os-tab{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px;border:none;background:transparent;color:var(--muted);font-family:var(--font);font-size:13px;font-weight:600;border-radius:10px;cursor:pointer;transition:.15s}
+.pwa-os-tab.active{background:var(--green);color:var(--ink)}
+.pwa-body{display:grid;grid-template-columns:230px 1fr;gap:24px;align-items:center}
+.pwa-phone{width:100%;max-width:230px;margin:auto}
+.pwa-steps{display:flex;flex-direction:column;gap:12px}
+.pwa-step{display:flex;align-items:flex-start;gap:13px}
+.pwa-step-num{flex-shrink:0;width:30px;height:30px;border-radius:10px;background:rgba(0,210,135,.14);color:var(--green);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center}
+.pwa-step-txt{font-size:13.5px;line-height:1.5;color:var(--text);padding-top:4px}
+.pwa-step-txt b{font-weight:700}
+.pwa-step-txt .kbd{display:inline-flex;align-items:center;gap:4px;background:var(--card2);border:1px solid var(--border);border-radius:7px;padding:1px 7px;font-weight:700;font-size:12.5px}
+.pwa-step-title{font-size:13.5px;line-height:1.45;color:var(--text)}
+.pwa-step-sub{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4}
+.pwa-note{font-size:12px;color:var(--faint);line-height:1.55;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:20px}
+.pwa-actions{display:flex;gap:10px;margin-top:22px}
+.pwa-actions .btn-primary{margin-top:0;flex:1}
+.pwa-actions .btn-ghost{margin-top:0;width:auto;padding:13px 22px}
+
+/* ════════════════════════════════════════════════════════════
+   ✦ NOUVEAU — VUE "COMPTE"
+   ════════════════════════════════════════════════════════════ */
+.acct-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.acct-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;display:flex;flex-direction:column}
+.acct-card.full{grid-column:1 / -1}
+.acct-card-head{display:flex;align-items:center;gap:11px;margin-bottom:18px}
+.acct-card-ico{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.acct-card-ico svg{width:19px;height:19px}
+.acct-card-title{font-size:15px;font-weight:700}
+.acct-card-desc{font-size:12px;color:var(--faint);margin-top:1px}
+.acct-field{margin-bottom:14px}
+.acct-field label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px;letter-spacing:.2px}
+.acct-field input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:14px;padding:11px 13px;border-radius:11px;outline:none;transition:.15s}
+.acct-field input:focus{border-color:var(--green)}
+.acct-field input:disabled{opacity:.6;cursor:not-allowed}
+.acct-field .ro-tag{font-size:10px;color:var(--faint);font-weight:600;margin-left:6px}
+.acct-msg{font-size:12px;margin-top:4px;min-height:15px;font-weight:500}
+.acct-btn-row{display:flex;gap:10px;margin-top:auto;padding-top:6px}
+.acct-btn{flex:1;padding:11px;border:none;border-radius:11px;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:.15s}
+.acct-btn.save{background:var(--green);color:var(--ink)}
+.acct-btn.save:hover{filter:brightness(1.05)}
+.acct-btn.ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.acct-btn.ghost:hover{background:var(--card2);color:var(--text)}
+.btn-danger{background:rgba(255,61,87,.12);border:1px solid rgba(255,61,87,.35);color:var(--red)}
+.btn-danger:hover{background:rgba(255,61,87,.2)}
+/* plan / abonnement */
+.plan-card{position:relative;overflow:hidden}
+.plan-badge{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--ink);background:var(--green);padding:5px 13px;border-radius:999px;margin-bottom:14px}
+.plan-price{font-size:38px;font-weight:800;letter-spacing:-.02em;line-height:1}
+.plan-price small{font-size:14px;font-weight:600;color:var(--muted)}
+.plan-feats{list-style:none;margin:16px 0 0;display:flex;flex-direction:column;gap:9px}
+.plan-feats li{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text)}
+.plan-feats li svg{flex-shrink:0;color:var(--green)}
+.plan-soon{margin-top:16px;font-size:11.5px;color:var(--faint);line-height:1.5;border-top:1px dashed var(--border);padding-top:13px}
+/* tuile action (installer / gérer) */
+.acct-action{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:15px 16px;cursor:pointer;transition:.15s;font-family:var(--font);color:var(--text);margin-bottom:11px}
+.acct-action:hover{border-color:var(--green);transform:translateX(2px)}
+.acct-action .aa-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:19px;background:rgba(0,210,135,.12)}
+.acct-action .aa-txt{flex:1}
+.acct-action .aa-title{font-size:14px;font-weight:700}
+.acct-action .aa-desc{font-size:12px;color:var(--faint);margin-top:2px;line-height:1.4}
+.acct-action .aa-arrow{color:var(--faint);flex-shrink:0}
+
+/* ════════════════════════════════════════════════════════════
+   ✦ NOUVEAU — GESTIONNAIRE D'HABITUDES (modal) + confirm
+   ════════════════════════════════════════════════════════════ */
+.modal-overlay{position:fixed;inset:0;z-index:320;background:rgba(8,10,22,.62);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px;animation:fadeUp .25s ease}
+.modal-card{width:100%;max-width:560px;background:var(--card);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
+.modal-head{display:flex;align-items:center;gap:11px;padding:22px 24px 0}
+.modal-head .mh-ico{font-size:21px}
+.modal-head .mh-title{font-size:18px;font-weight:800;letter-spacing:-.02em;flex:1}
+.modal-head .mh-close{width:32px;height:32px;border-radius:9px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center}
+.modal-head .mh-close:hover{background:var(--card2);color:var(--text)}
+.modal-body{padding:18px 24px;overflow-y:auto}
+.modal-foot{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;flex-shrink:0}
+.modal-foot .btn-primary{margin-top:0;flex:1}
+.modal-foot .btn-ghost{margin-top:0;width:auto;padding:13px 22px}
+.tm-warning{display:flex;gap:11px;align-items:flex-start;font-size:12.5px;line-height:1.55;color:var(--text);background:rgba(255,203,0,.1);border:1px solid rgba(255,203,0,.32);border-radius:13px;padding:13px 15px;margin-bottom:18px}
+.tm-warning .tw-ico{font-size:16px;flex-shrink:0}
+.tm-warning b{color:var(--yellow)}
+.tm-habit{background:var(--card2);border:1px solid var(--border);border-radius:15px;padding:14px 15px;margin-bottom:11px}
+.tm-habit-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.tm-habit-emoji{font-size:18px}
+.tm-habit-name{font-size:14.5px;font-weight:600;flex:1}
+.tm-habit-del{width:32px;height:32px;border-radius:9px;border:1px solid rgba(255,61,87,.35);background:rgba(255,61,87,.1);color:var(--red);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s}
+.tm-habit-del:hover{background:rgba(255,61,87,.2)}
+.tm-row-lbl{font-size:10.5px;font-weight:600;color:var(--muted);letter-spacing:.2px;margin-bottom:7px;display:block}
+.tm-date input{background:var(--card);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:13px;padding:8px 11px;border-radius:9px;outline:none;width:100%;max-width:190px;margin-top:6px}
+.tm-add-zone{border:1px dashed var(--border);border-radius:15px;padding:15px;margin-top:6px}
+.tm-add-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;max-height:230px;overflow-y:auto;margin-top:12px;padding-right:4px}
+.tm-confirm-card{max-width:420px;text-align:center;padding:26px 26px 22px}
+.tm-confirm-ico{font-size:38px;margin-bottom:10px}
+.tm-confirm-title{font-size:18px;font-weight:800;margin-bottom:8px}
+.tm-confirm-txt{font-size:13.5px;color:var(--muted);line-height:1.6;margin-bottom:6px}
+.tm-confirm-txt b{color:var(--text)}
+.tm-confirm-highlight{font-size:12.5px;color:var(--red);font-weight:600;background:rgba(255,61,87,.1);border:1px solid rgba(255,61,87,.3);border-radius:11px;padding:10px 13px;margin:14px 0 18px;line-height:1.5}
+.tm-confirm-actions{display:flex;gap:10px}
+.tm-confirm-actions button{flex:1;padding:12px;border-radius:11px;font-family:var(--font);font-size:13.5px;font-weight:700;cursor:pointer;border:none;transition:.15s}
+
+/* ════════════════════════════════════════════════════════════
    RESPONSIVE
    ════════════════════════════════════════════════════════════ */
 @media(max-width:1100px){.stat-grid-4{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:900px){.week-layout{grid-template-columns:1fr}.cal-grid-2{grid-template-columns:1fr}}
+@media(max-width:900px){.week-layout{grid-template-columns:1fr}.cal-grid-2{grid-template-columns:1fr}.acct-grid{grid-template-columns:1fr}.pwa-body{grid-template-columns:1fr}.pwa-phone{max-width:200px;order:-1}}
 
 @media(max-width:760px){
   html,body{overflow:auto;height:auto}
@@ -354,9 +459,10 @@ canvas{display:block}
   .hb-meta{grid-column:1 / -1;justify-content:flex-start;margin-top:-4px}
   .tb-chip{padding:8px 13px;font-size:12px}
   .panel{padding:16px}
-  .onb-card,.auth-card{padding:22px 18px}
-  .onb-title{font-size:21px}
+  .onb-card,.auth-card,.pwa-card{padding:22px 18px}
+  .onb-title,.pwa-title{font-size:21px}
   .task-grid{grid-template-columns:1fr 1fr}
+  .acct-grid{grid-template-columns:1fr}
 }
 @media(max-width:420px){
   .task-grid{grid-template-columns:1fr}
@@ -436,6 +542,32 @@ canvas{display:block}
   </div>
 </div>
 
+<!-- ══════════════════════════ ✦ NOUVEAU : ÉCRAN INSTALLER L'APP ══════════════════════════ -->
+<div id="pwa-screen" class="hidden">
+  <div class="pwa-card">
+    <span class="pwa-badge">✦ Étape recommandée</span>
+    <div class="pwa-title">Ajoute To-Do Growth à ton écran d'accueil 📲</div>
+    <div class="pwa-sub">Installe le dashboard comme une vraie application — plein écran, accès en un toucher, et tu retrouves tes habitudes en une seconde. C'est gratuit et ça prend 20 secondes.</div>
+
+    <div class="pwa-os-tabs">
+      <button class="pwa-os-tab active" data-os="ios">🍎 iPhone</button>
+      <button class="pwa-os-tab" data-os="android">🤖 Android</button>
+    </div>
+
+    <div class="pwa-body">
+      <div class="pwa-phone" id="pwa-phone"></div>
+      <div class="pwa-steps" id="pwa-steps"></div>
+    </div>
+
+    <div class="pwa-note" id="pwa-note"></div>
+
+    <div class="pwa-actions">
+      <button class="btn-primary" id="pwa-continue">C'est installé / Continuer →</button>
+      <button class="btn-ghost" id="pwa-skip">Plus tard</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══════════════════════════ ONBOARDING ══════════════════════════ -->
 <div id="onboarding-screen" class="hidden">
   <div class="onb-card">
@@ -505,6 +637,10 @@ canvas{display:block}
         <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 2.5.93 4.79 2.46 6.54L12 22l7.54-3.46C21.07 16.79 22 14.5 22 12c0-5.52-4.48-10-10-10z"/><path d="M12 8v4l2 2"/></svg>
         Séries & records
       </button>
+      <button class="nav-btn" data-view="account">
+        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Compte
+      </button>
     </nav>
 
     <div class="sidebar-foot">
@@ -550,9 +686,12 @@ canvas{display:block}
 
       <!-- ══ VIEW: WEEKLY ══ -->
       <div class="view active" id="view-weekly">
-        <div class="view-title">
-          <h1>Vue hebdo</h1>
-          <p id="week-subtitle"></p>
+        <div class="view-title" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <div>
+            <h1>Vue hebdo</h1>
+            <p id="week-subtitle"></p>
+          </div>
+          <button class="acct-btn ghost" id="open-tm-weekly" style="flex:0 0 auto;padding:10px 16px;width:auto">✏️ Gérer mes habitudes</button>
         </div>
         <div class="prog-wrap">
           <div class="prog-head">
@@ -646,6 +785,15 @@ canvas{display:block}
         </div>
       </div>
 
+      <!-- ══ ✦ NOUVEAU VIEW: ACCOUNT ══ -->
+      <div class="view" id="view-account">
+        <div class="view-title">
+          <h1>Mon compte</h1>
+          <p>Gère tes informations, ton abonnement et tes paramètres.</p>
+        </div>
+        <div class="acct-grid" id="account-grid"></div>
+      </div>
+
     </div><!-- /content -->
   </div><!-- /main -->
 </div><!-- /app-shell -->
@@ -668,9 +816,9 @@ canvas{display:block}
     <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 2.5.93 4.79 2.46 6.54L12 22l7.54-3.46C21.07 16.79 22 14.5 22 12c0-5.52-4.48-10-10-10z"/><path d="M12 8v4l2 2"/></svg>
     <span>Séries</span>
   </button>
-  <button class="mnav-btn" id="mnav-logout">
-    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-    <span>Quitter</span>
+  <button class="mnav-btn" data-view="account" data-label="Mon compte">
+    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>Compte</span>
   </button>
 </nav>
 
@@ -834,7 +982,7 @@ async function initSupabase() {
    ============================================================ */
 const Store = (() => {
   let demoMode = false;
-  let demoData = null;   // { habits, completions } pour la démo locale
+  let demoData = null;   // { habits, completions, profile } pour la démo locale
 
   /* générateur pseudo-aléatoire reproductible (données de démo) */
   function mulberry32(a){return function(){a|=0;a=(a+0x6d2b79f5)|0;let t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};}
@@ -867,7 +1015,11 @@ const Store = (() => {
       { id:'projet',  name:'Projet',    emoji:'🚀', color:C.orange, days:[0,1,2,3,6],     start:'2026-05-17' },
     ];
     const RATE = { water:.92, italian:.84, news:.74, sport:.60, reading:.70, projet:.50 };
-    return { habits: demoHabits, completions: seedCompletions(demoHabits, RATE) };
+    return {
+      habits: demoHabits,
+      completions: seedCompletions(demoHabits, RATE),
+      profile: { email:'demo@todogrowth.app', phone:'+33 6 00 00 00 00', name:'Compte démo', created_at:'2026-05-17T09:00:00Z' },
+    };
   }
 
   return {
@@ -903,7 +1055,7 @@ const Store = (() => {
       return res.data.user;
     },
     logInDemo() { demoMode = true; demoData = buildDemo(); return demoData; },
-    async logOut() { demoMode = false; demoData = null; await sb.auth.signOut(); },
+    async logOut() { demoMode = false; demoData = null; if (sb) await sb.auth.signOut(); },
 
     /* "rester connecté" : on choisit la durée de session.
        Supabase persiste la session par défaut ; si l'utilisateur
@@ -918,6 +1070,28 @@ const Store = (() => {
     async currentSession() {
       const { data } = await sb.auth.getSession();
       return data.session;
+    },
+
+    /* --- INFOS UTILISATEUR (✦ nouveau) --- */
+    async getUser() {
+      if (demoMode) {
+        const p = demoData.profile;
+        return { email:p.email, created_at:p.created_at, user_metadata:{ phone:p.phone, name:p.name } };
+      }
+      const { data: { user } } = await sb.auth.getUser();
+      return user;
+    },
+    /* met à jour les métadonnées (téléphone, nom) — ✦ nouveau */
+    async updateProfile(meta) {
+      if (demoMode) { demoData.profile = { ...demoData.profile, ...meta }; return; }
+      const { error } = await sb.auth.updateUser({ data: meta });
+      if (error) throw new Error(traduireErreur(error.message));
+    },
+    /* change le mot de passe de l'utilisateur connecté — ✦ nouveau */
+    async changePassword(newPass) {
+      if (demoMode) return; // la démo ne persiste rien
+      const { error } = await sb.auth.updateUser({ password: newPass });
+      if (error) throw new Error(traduireErreur(error.message));
     },
 
     /* --- DONNÉES (habits + completions) --- */
@@ -954,6 +1128,43 @@ const Store = (() => {
       if (error) throw new Error(error.message);
     },
 
+    /* Ajoute UNE habitude — ✦ nouveau */
+    async addHabit(h) {
+      if (demoMode) { demoData.habits.push(h); return; }
+      const { data: { user } } = await sb.auth.getUser();
+      const { error } = await sb.from('habits').upsert(
+        [{ user_id:user.id, task_id:h.id, name:h.name, emoji:h.emoji, color:h.color, days:h.days, start_date:h.start }],
+        { onConflict:'user_id,task_id' });
+      if (error) throw new Error(error.message);
+    },
+
+    /* Met à jour UNE habitude existante (jours / date / nom) — ✦ nouveau */
+    async updateHabit(h) {
+      if (demoMode) { const i=demoData.habits.findIndex(x=>x.id===h.id); if(i>=0) demoData.habits[i]={...demoData.habits[i],...h}; return; }
+      const { data: { user } } = await sb.auth.getUser();
+      const { error } = await sb.from('habits')
+        .update({ name:h.name, emoji:h.emoji, color:h.color, days:h.days, start_date:h.start })
+        .eq('user_id', user.id).eq('task_id', h.id);
+      if (error) throw new Error(error.message);
+    },
+
+    /* Supprime UNE habitude + tout son historique — ✦ nouveau
+       (c'est cette suppression de l'historique qui justifie l'avertissement) */
+    async deleteHabit(taskId) {
+      if (demoMode) {
+        demoData.habits = demoData.habits.filter(h=>h.id!==taskId);
+        for (const k of Object.keys(demoData.completions)) {
+          demoData.completions[k] = demoData.completions[k].filter(id=>id!==taskId);
+          if (!demoData.completions[k].length) delete demoData.completions[k];
+        }
+        return;
+      }
+      const { data: { user } } = await sb.auth.getUser();
+      await sb.from('completions').delete().eq('user_id', user.id).eq('task_id', taskId);
+      const { error } = await sb.from('habits').delete().eq('user_id', user.id).eq('task_id', taskId);
+      if (error) throw new Error(error.message);
+    },
+
     /* Coche / décoche une tâche un jour donné */
     async setCompletion(iso, taskId, done) {
       if (demoMode) return; // la démo ne persiste rien
@@ -977,6 +1188,7 @@ function traduireErreur(msg) {
   if (m.includes('already registered') || m.includes('already exists') || m.includes('user already')) return 'Un compte existe déjà avec cet e-mail.';
   if (m.includes('invalid login')) return 'E-mail ou mot de passe incorrect.';
   if (m.includes('password should be') || m.includes('password') && m.includes('least')) return 'Mot de passe : 8 caractères minimum.';
+  if (m.includes('new password should be different')) return 'Le nouveau mot de passe doit être différent de l\'ancien.';
   if (m.includes('email not confirmed')) return "Ton e-mail n'est pas encore confirmé. Clique le lien reçu par e-mail, puis reconnecte-toi.";
   if (m.includes('sending') && m.includes('email')) return "L'e-mail de confirmation n'a pas pu être envoyé. Réessaie dans quelques minutes (limite de l'offre gratuite).";
   if (m.includes('rate limit') || m.includes('too many')) return 'Trop de tentatives. Patiente quelques minutes avant de réessayer.';
@@ -1551,18 +1763,16 @@ function toggleHabit(iso, habitId) {
   if (!APP.completions[iso]) APP.completions[iso] = [];
   const arr = APP.completions[iso];
   const idx = arr.indexOf(habitId);
-  const nowDone = idx < 0;               // true = on vient de cocher
+  const nowDone = idx < 0;
   if (idx >= 0) arr.splice(idx, 1); else arr.push(habitId);
   if (!arr.length) delete APP.completions[iso];
   const dt = parseISO(iso);
   const need = expectedOn(dt).map(h=>h.id);
   const done = new Set(APP.completions[iso]||[]);
   if (need.length && need.every(id=>done.has(id))) setTimeout(burst, 30);
-  // affichage instantané
   updateTopbar();
   updateSidebarScore();
   renderCurrentView();
-  // écriture en base en arrière-plan (sauf en mode démo)
   Store.setCompletion(iso, habitId, nowDone).catch(err => console.warn('Sauvegarde:', err.message));
 }
 
@@ -1605,16 +1815,16 @@ function renderCurrentView() {
   if (currentView==='monthly') renderMonthly();
   if (currentView==='annual')  renderAnnual();
   if (currentView==='streaks') renderStreaks();
+  if (currentView==='account') renderAccount();
 }
 let resizeTimer;
 window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(renderCurrentView, 150); });
 
 /* ============================================================
-   WEEKLY SUMMARY  (résumé hebdo — aperçu en app ; en prod = e-mail dimanche)
+   WEEKLY SUMMARY
    ============================================================ */
 function buildSummaryHTML() {
   const T = today();
-  // semaine écoulée (lundi -> dimanche de la semaine courante)
   const monday = mondayOf(T);
   const sunday = addDays(monday,6);
   const s = rangeStats(monday, sunday > T ? T : sunday);
@@ -1668,7 +1878,7 @@ document.getElementById('summary-btn').addEventListener('click', openSummary);
    ONBOARDING LOGIC
    ============================================================ */
 let onbSelected = new Set();
-let onbConfig = {};  // id -> { days:[], start:'YYYY-MM-DD' }
+let onbConfig = {};
 
 function renderTaskLibrary() {
   const wrap = document.getElementById('task-library');
@@ -1766,7 +1976,6 @@ document.getElementById('btn-back-step1').addEventListener('click', () => {
 document.getElementById('btn-finish').addEventListener('click', async () => {
   const btn = document.getElementById('btn-finish');
   btn.disabled = true; const old = btn.textContent; btn.textContent = 'Création…';
-  // construire les habitudes de l'utilisateur
   const habits = [...onbSelected].map((id,i) => {
     const t = TASK_BY_ID[id];
     const cfg = onbConfig[id] || { days:[0,1,2,3,4], start:fmtISO(today()) };
@@ -1815,7 +2024,7 @@ document.getElementById('btn-demo').addEventListener('click', async () => {
 });
 
 document.getElementById('btn-signup').addEventListener('click', async () => {
-  const err = document.getElementById('su-err'); err.textContent='';
+  const err = document.getElementById('su-err'); err.style.color=''; err.textContent='';
   const email = document.getElementById('su-email').value.trim();
   const phone = document.getElementById('su-phone').value.trim();
   const p1 = document.getElementById('su-pass').value;
@@ -1828,7 +2037,6 @@ document.getElementById('btn-signup').addEventListener('click', async () => {
   Store.setPersistence(true);
   try {
     await Store.signUp(email, phone, p1);
-    // Selon la config Supabase, le compte peut nécessiter une confirmation par e-mail.
     const session = await Store.currentSession();
     if (!session) {
       err.style.color = 'var(--green)';
@@ -1836,7 +2044,8 @@ document.getElementById('btn-signup').addEventListener('click', async () => {
       btn.disabled = false; btn.textContent = old;
       return;
     }
-    startOnboarding();
+    // ✦ NOUVEAU : on montre l'écran d'installation PWA avant l'onboarding
+    showPwaScreen(startOnboarding);
   } catch(e) { err.textContent = e.message; }
   btn.disabled = false; btn.textContent = old;
 });
@@ -1849,6 +2058,105 @@ async function routeAfterAuth() {
 }
 
 /* ============================================================
+   ✦ NOUVEAU : ÉCRAN D'INSTALLATION PWA
+   ============================================================ */
+let pwaNext = null;   // callback exécuté quand on quitte l'écran PWA
+
+function detectOS() {
+  const ua = (navigator.userAgent || navigator.vendor || '').toLowerCase();
+  if (/iphone|ipad|ipod/.test(ua) || (/macintosh/.test(ua) && 'ontouchend' in document)) return 'ios';
+  if (/android/.test(ua)) return 'android';
+  return 'ios'; // valeur par défaut (la plupart des amis sur iPhone) — onglets restent cliquables
+}
+
+/* Illustration vectorielle d'un téléphone — themeable, remplaçable plus tard par un vrai screenshot */
+function pwaPhoneSVG(os) {
+  const accent = os==='ios' ? '#3fa9f5' : '#00d287';
+  const barIcon = os==='ios'
+    /* icône Partager iOS : carré + flèche vers le haut */
+    ? `<rect x="150" y="392" width="34" height="34" rx="9" fill="${accent}"/>
+       <path d="M167 400 l0 16 M167 400 l-5 5 M167 400 l5 5" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+       <path d="M159 410 l0 9 16 0 0-9" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`
+    /* menu Android : 3 points verticaux */
+    : `<rect x="150" y="392" width="34" height="34" rx="9" fill="${accent}"/>
+       <circle cx="167" cy="402" r="2.4" fill="#fff"/><circle cx="167" cy="409" r="2.4" fill="#fff"/><circle cx="167" cy="416" r="2.4" fill="#fff"/>`;
+  return `
+  <svg viewBox="0 0 220 460" width="170" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">
+    <rect x="6" y="6" width="208" height="448" rx="34" fill="var(--card2)" stroke="var(--border)" stroke-width="2"/>
+    <rect x="18" y="40" width="184" height="380" rx="18" fill="var(--bg)"/>
+    <rect x="78" y="18" width="64" height="11" rx="5.5" fill="var(--border)"/>
+    <!-- mini logo To-Do Growth -->
+    <g transform="translate(86,70) scale(0.7)">
+      <rect x="2" y="32" width="30" height="30" rx="9" fill="#ff3d57"/>
+      <rect x="17" y="18" width="30" height="30" rx="9" fill="#ffcb00"/>
+      <rect x="32" y="4" width="30" height="30" rx="9" fill="#00d287"/>
+    </g>
+    <rect x="52" y="150" width="116" height="11" rx="5.5" fill="var(--border)"/>
+    <rect x="40" y="180" width="140" height="44" rx="12" fill="var(--card)" stroke="var(--border)" stroke-width="1.5"/>
+    <rect x="40" y="234" width="140" height="44" rx="12" fill="var(--card)" stroke="var(--border)" stroke-width="1.5"/>
+    <rect x="40" y="288" width="140" height="44" rx="12" fill="var(--card)" stroke="var(--border)" stroke-width="1.5"/>
+    <circle cx="58" cy="202" r="7" fill="#00d287"/><circle cx="58" cy="256" r="7" fill="#ffcb00"/><circle cx="58" cy="310" r="7" fill="#ff3d57"/>
+    <!-- barre du navigateur en bas + bouton mis en évidence -->
+    <rect x="18" y="384" width="184" height="50" rx="0" fill="var(--panel)"/>
+    <rect x="30" y="396" width="100" height="26" rx="13" fill="var(--card2)"/>
+    ${barIcon}
+    <circle cx="167" cy="409" r="22" fill="none" stroke="${accent}" stroke-width="2.5" stroke-dasharray="5 5"/>
+  </svg>`;
+}
+
+function pwaStepsHTML(os) {
+  const steps = os==='ios'
+    ? [
+        ['1','Ouvre le lien dans <b>Safari</b>','massimoepicureo.github.io/to-do-growth'],
+        ['2','Touche l’icône <b>Partager</b>','le carré avec une flèche vers le haut, en bas de l’écran'],
+        ['3','Choisis <b>« Sur l’écran d’accueil »</b>','fais défiler le menu si besoin'],
+        ['4','Touche <b>Ajouter</b>','l’app apparaît sur ton écran d’accueil ✨'],
+      ]
+    : [
+        ['1','Ouvre le lien dans <b>Chrome</b>','massimoepicureo.github.io/to-do-growth'],
+        ['2','Touche le <b>menu ⋮</b>','les trois points en haut à droite'],
+        ['3','Choisis <b>« Ajouter à l’écran d’accueil »</b>','ou « Installer l’application »'],
+        ['4','Touche <b>Ajouter</b>','l’app apparaît sur ton écran d’accueil ✨'],
+      ];
+  return steps.map(([n,t,s]) => `
+    <div class="pwa-step">
+      <span class="pwa-step-num">${n}</span>
+      <div class="pwa-step-txt"><div class="pwa-step-title">${t}</div><div class="pwa-step-sub">${s}</div></div>
+    </div>`).join('');
+}
+
+function setPwaOS(os) {
+  document.querySelectorAll('.pwa-os-tab').forEach(b => b.classList.toggle('active', b.dataset.os===os));
+  document.getElementById('pwa-phone').innerHTML = pwaPhoneSVG(os);
+  document.getElementById('pwa-steps').innerHTML = pwaStepsHTML(os);
+  document.getElementById('pwa-note').innerHTML = os==='ios'
+    ? `💡 <b>Astuce :</b> une fois ajoutée, l’app s’ouvre en plein écran, sans la barre d’adresse — comme une vraie application.`
+    : `💡 <b>Astuce :</b> selon ton téléphone, le bouton peut s’appeler « Installer l’application ». Le résultat est le même : une icône sur ton écran d’accueil.`;
+}
+
+function showPwaScreen(next) {
+  pwaNext = (typeof next === 'function') ? next : null;
+  setPwaOS(detectOS());
+  document.getElementById('auth-screen').classList.add('hidden');
+  document.getElementById('onboarding-screen').classList.add('hidden');
+  document.getElementById('app-shell').classList.add('hidden');
+  document.body.classList.remove('app-active');
+  updateMobileNav();
+  document.getElementById('pwa-screen').classList.remove('hidden');
+  window.scrollTo(0,0);
+}
+function leavePwaScreen() {
+  document.getElementById('pwa-screen').classList.add('hidden');
+  const cb = pwaNext; pwaNext = null;
+  if (cb) cb();
+}
+document.querySelectorAll('.pwa-os-tab').forEach(btn => {
+  btn.addEventListener('click', () => setPwaOS(btn.dataset.os));
+});
+document.getElementById('pwa-continue').addEventListener('click', leavePwaScreen);
+document.getElementById('pwa-skip').addEventListener('click', leavePwaScreen);
+
+/* ============================================================
    SCREEN TRANSITIONS
    ============================================================ */
 function startOnboarding() {
@@ -1858,6 +2166,7 @@ function startOnboarding() {
   document.getElementById('dot-1').className='onb-step-dot active'; document.getElementById('dot-1').textContent='1';
   document.getElementById('dot-2').className='onb-step-dot';
   renderTaskLibrary();
+  document.getElementById('pwa-screen').classList.add('hidden');
   document.getElementById('auth-screen').classList.add('hidden');
   document.getElementById('onboarding-screen').classList.remove('hidden');
 }
@@ -1869,11 +2178,11 @@ async function logout() {
   updateMobileNav();
   document.getElementById('app-shell').classList.add('hidden');
   document.getElementById('onboarding-screen').classList.add('hidden');
+  document.getElementById('pwa-screen').classList.add('hidden');
   document.getElementById('auth-screen').classList.remove('hidden');
   document.getElementById('login-pass').value='';
 }
 document.getElementById('logout-btn').addEventListener('click', logout);
-document.getElementById('mnav-logout').addEventListener('click', logout);
 
 async function enterApp() {
   const data = await Store.loadAll();
@@ -1882,11 +2191,11 @@ async function enterApp() {
 
   document.getElementById('auth-screen').classList.add('hidden');
   document.getElementById('onboarding-screen').classList.add('hidden');
+  document.getElementById('pwa-screen').classList.add('hidden');
   document.getElementById('app-shell').classList.remove('hidden');
   document.body.classList.add('app-active');
   updateMobileNav();
 
-  // reset vues
   weekOffset = 0;
   monthState = { y: today().getFullYear(), m: today().getMonth() };
   yearState = today().getFullYear();
@@ -1895,9 +2204,332 @@ async function enterApp() {
   updateSidebarScore();
   switchView('weekly', 'Vue hebdo');
 
-  // résumé hebdo : s'ouvre automatiquement le dimanche
   if (today().getDay() === 0) setTimeout(openSummary, 600);
 }
+
+/* ============================================================
+   ✦ NOUVEAU : VUE COMPTE
+   ============================================================ */
+const CHECK_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+async function renderAccount() {
+  const grid = document.getElementById('account-grid');
+  let user = null;
+  try { user = await Store.getUser(); } catch(e) { /* ignore */ }
+  const email = (user && user.email) || '—';
+  const meta = (user && user.user_metadata) || {};
+  const phone = meta.phone || '';
+  const name = meta.name || '';
+  const created = (user && user.created_at) ? new Date(user.created_at) : null;
+  const memberSince = created ? `${created.getDate()} ${MONTH_NAMES[created.getMonth()]} ${created.getFullYear()}` : '—';
+  const demo = Store.isDemo();
+
+  grid.innerHTML = `
+    <!-- INFOS PERSO -->
+    <div class="acct-card">
+      <div class="acct-card-head">
+        <div class="acct-card-ico" style="background:rgba(63,169,245,.14);color:${C.blue}">
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div><div class="acct-card-title">Informations personnelles</div><div class="acct-card-desc">Ton profil To-Do Growth</div></div>
+      </div>
+      <div class="acct-field">
+        <label>Adresse e-mail <span class="ro-tag">· non modifiable</span></label>
+        <input type="email" id="acct-email" value="${email}" disabled/>
+      </div>
+      <div class="acct-field">
+        <label>Nom / pseudo</label>
+        <input type="text" id="acct-name" value="${name}" placeholder="Ton prénom ou pseudo"/>
+      </div>
+      <div class="acct-field">
+        <label>Téléphone</label>
+        <input type="tel" id="acct-phone" value="${phone}" placeholder="+33 6 12 34 56 78"/>
+      </div>
+      <div class="acct-field" style="margin-bottom:6px">
+        <label>Membre depuis</label>
+        <input type="text" value="${memberSince}" disabled/>
+      </div>
+      <div class="acct-msg" id="acct-info-msg"></div>
+      <div class="acct-btn-row">
+        <button class="acct-btn save" id="acct-save-info">Enregistrer</button>
+      </div>
+    </div>
+
+    <!-- ABONNEMENT -->
+    <div class="acct-card plan-card">
+      <div class="acct-card-head">
+        <div class="acct-card-ico" style="background:rgba(0,210,135,.14);color:${C.green}">
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4-6.3-4.6L5.7 21 8 14 2 9.4h7.6z"/></svg>
+        </div>
+        <div><div class="acct-card-title">Abonnement</div><div class="acct-card-desc">Ton offre actuelle</div></div>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:10px">
+        <span style="font-size:30px;font-weight:800;letter-spacing:-.03em">Gratuit</span>
+        <span style="font-size:13px;color:var(--muted)">pour toujours</span>
+      </div>
+      <ul class="plan-feats">
+        <li>${CHECK_SVG} Habitudes illimitées</li>
+        <li>${CHECK_SVG} Suivi hebdo, mensuel & annuel</li>
+        <li>${CHECK_SVG} Séries, records & résumés</li>
+        <li>${CHECK_SVG} Synchronisation multi-appareils</li>
+        <li>${CHECK_SVG} Installation en application (PWA)</li>
+      </ul>
+      <div style="font-size:12px;color:var(--faint);margin-top:16px;line-height:1.5">Aucune carte bancaire requise. To-Do Growth est offert à toi et tes amis. 💚</div>
+    </div>
+
+    <!-- SÉCURITÉ -->
+    <div class="acct-card">
+      <div class="acct-card-head">
+        <div class="acct-card-ico" style="background:rgba(164,140,255,.14);color:${C.purple}">
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div><div class="acct-card-title">Sécurité</div><div class="acct-card-desc">Modifier ton mot de passe</div></div>
+      </div>
+      <div class="acct-field">
+        <label>Nouveau mot de passe</label>
+        <input type="password" id="acct-pass1" placeholder="8 caractères minimum" autocomplete="new-password"/>
+      </div>
+      <div class="acct-field" style="margin-bottom:6px">
+        <label>Confirmer le mot de passe</label>
+        <input type="password" id="acct-pass2" placeholder="••••••••" autocomplete="new-password"/>
+      </div>
+      <div class="acct-msg" id="acct-pass-msg"></div>
+      <div class="acct-btn-row">
+        <button class="acct-btn save" id="acct-save-pass">Mettre à jour</button>
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="acct-card full">
+      <div class="acct-card-head">
+        <div class="acct-card-ico" style="background:rgba(255,203,0,.14);color:${C.yellow}">
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </div>
+        <div><div class="acct-card-title">Paramètres & gestion</div><div class="acct-card-desc">Application et habitudes</div></div>
+      </div>
+      <button class="acct-action" id="acct-install">
+        <span class="aa-ico">📲</span>
+        <span class="aa-txt"><span class="aa-title">Installer sur mon téléphone</span><span class="aa-desc">Ajoute le dashboard à ton écran d'accueil comme une vraie app</span></span>
+        <span class="aa-arrow"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
+      </button>
+      <button class="acct-action" id="acct-manage">
+        <span class="aa-ico" style="background:rgba(255,203,0,.14)">✏️</span>
+        <span class="aa-txt"><span class="aa-title">Gérer mes habitudes</span><span class="aa-desc">Modifier les jours, la date de départ, ajouter ou retirer une habitude</span></span>
+        <span class="aa-arrow"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
+      </button>
+      <button class="acct-action" id="acct-logout" style="border-color:rgba(255,61,87,.25)">
+        <span class="aa-ico" style="background:rgba(255,61,87,.12)">
+          <svg width="19" height="19" fill="none" stroke="${C.red}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </span>
+        <span class="aa-txt"><span class="aa-title" style="color:${C.red}">Se déconnecter</span><span class="aa-desc">Tu reviendras à l'écran de connexion</span></span>
+        <span class="aa-arrow"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
+      </button>
+    </div>`;
+
+  // — Enregistrer infos perso —
+  document.getElementById('acct-save-info').addEventListener('click', async () => {
+    const msg = document.getElementById('acct-info-msg');
+    const btn = document.getElementById('acct-save-info');
+    const newName = document.getElementById('acct-name').value.trim();
+    const newPhone = document.getElementById('acct-phone').value.trim();
+    btn.disabled = true; const old = btn.textContent; btn.textContent = 'Enregistrement…';
+    try {
+      await Store.updateProfile({ name:newName, phone:newPhone });
+      msg.style.color = 'var(--green)';
+      msg.textContent = demo ? 'Enregistré (démo — local uniquement).' : 'Informations mises à jour ✓';
+    } catch(e) { msg.style.color = 'var(--red)'; msg.textContent = e.message; }
+    btn.disabled = false; btn.textContent = old;
+  });
+
+  // — Changer mot de passe —
+  document.getElementById('acct-save-pass').addEventListener('click', async () => {
+    const msg = document.getElementById('acct-pass-msg');
+    const btn = document.getElementById('acct-save-pass');
+    const p1 = document.getElementById('acct-pass1').value;
+    const p2 = document.getElementById('acct-pass2').value;
+    msg.style.color = 'var(--red)';
+    if (p1.length < 8) { msg.textContent = 'Mot de passe : 8 caractères minimum.'; return; }
+    if (p1 !== p2) { msg.textContent = 'Les mots de passe ne correspondent pas.'; return; }
+    if (demo) { msg.style.color = 'var(--muted)'; msg.textContent = 'Mode démo : le mot de passe n\'est pas réellement modifié.'; return; }
+    btn.disabled = true; const old = btn.textContent; btn.textContent = 'Mise à jour…';
+    try {
+      await Store.changePassword(p1);
+      msg.style.color = 'var(--green)'; msg.textContent = 'Mot de passe mis à jour ✓';
+      document.getElementById('acct-pass1').value=''; document.getElementById('acct-pass2').value='';
+    } catch(e) { msg.style.color = 'var(--red)'; msg.textContent = e.message; }
+    btn.disabled = false; btn.textContent = old;
+  });
+
+  // — Actions —
+  document.getElementById('acct-install').addEventListener('click', () => {
+    showPwaScreen(() => { document.getElementById('app-shell').classList.remove('hidden'); document.body.classList.add('app-active'); updateMobileNav(); switchView('account','Mon compte'); });
+  });
+  document.getElementById('acct-manage').addEventListener('click', openTaskManager);
+  document.getElementById('acct-logout').addEventListener('click', logout);
+}
+
+/* ============================================================
+   ✦ NOUVEAU : GESTIONNAIRE D'HABITUDES (modal)
+   ============================================================ */
+let tmDraft = [];          // copie de travail des habitudes
+let tmOriginalIds = [];    // ids présents à l'ouverture (pour le diff)
+
+function openTaskManager() {
+  tmDraft = HABITS.map(h => ({ id:h.id, name:h.name, emoji:h.emoji, color:h.color, days:[...h.days], start:h.start }));
+  tmOriginalIds = tmDraft.map(h => h.id);
+  const ov = document.createElement('div');
+  ov.className = 'modal-overlay'; ov.id = 'tm-overlay';
+  ov.innerHTML = `
+    <div class="modal-card">
+      <div class="modal-head">
+        <span class="mh-ico">✏️</span>
+        <span class="mh-title">Gérer mes habitudes</span>
+        <button class="mh-close" id="tm-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="tm-warning">
+          <span class="tw-ico">⚠️</span>
+          <div>Modifier les <b>jours</b> ou la <b>date de démarrage</b> est sans risque. En revanche, <b>supprimer</b> une habitude efface aussi tout son historique : son suivi mensuel et annuel ne pourra plus être assuré. Cette action est définitive.</div>
+        </div>
+        <div id="tm-list"></div>
+        <div class="tm-add-zone">
+          <span class="tm-row-lbl" style="margin-bottom:0">➕ Ajouter une habitude</span>
+          <div class="tm-add-grid" id="tm-add-grid"></div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn-ghost" id="tm-cancel">Annuler</button>
+        <button class="btn-primary" id="tm-save">Enregistrer les modifications</button>
+      </div>
+    </div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener('click', e => { if (e.target===ov) closeTaskManager(); });
+  document.getElementById('tm-close').addEventListener('click', closeTaskManager);
+  document.getElementById('tm-cancel').addEventListener('click', closeTaskManager);
+  document.getElementById('tm-save').addEventListener('click', saveTaskManager);
+  renderTmList();
+  renderTmAddGrid();
+}
+function closeTaskManager() { const ov=document.getElementById('tm-overlay'); if (ov) ov.remove(); }
+
+function renderTmList() {
+  const wrap = document.getElementById('tm-list');
+  const todayISO = fmtISO(today());
+  if (!tmDraft.length) { wrap.innerHTML = `<div class="empty-note">Aucune habitude pour le moment. Ajoute-en une ci-dessous 👇</div>`; return; }
+  wrap.innerHTML = tmDraft.map(h => `
+    <div class="tm-habit" data-id="${h.id}">
+      <div class="tm-habit-top">
+        <span class="tm-habit-emoji">${h.emoji}</span>
+        <span class="tm-habit-name">${h.name}</span>
+        <button class="tm-habit-del" data-del="${h.id}" title="Supprimer">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
+      </div>
+      <span class="tm-row-lbl">Jours concernés (${h.days.length} j / sem.)</span>
+      <div class="days-row">
+        ${DAY_SHORT.map((d,i)=>`<button class="day-toggle${h.days.includes(i)?' on':''}" data-id="${h.id}" data-day="${i}">${d}</button>`).join('')}
+      </div>
+      <div class="tm-date">
+        <span class="tm-row-lbl" style="margin-top:12px">Date de démarrage</span>
+        <input type="date" value="${h.start}" max="${todayISO}" data-id="${h.id}"/>
+      </div>
+    </div>`).join('');
+
+  wrap.querySelectorAll('.day-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const h = tmDraft.find(x=>x.id===btn.dataset.id); if (!h) return;
+      const di = +btn.dataset.day; const idx = h.days.indexOf(di);
+      if (idx>=0) h.days.splice(idx,1); else h.days.push(di);
+      h.days.sort((a,b)=>a-b);
+      btn.classList.toggle('on');
+      const lbl = btn.closest('.tm-habit').querySelector('.tm-row-lbl');
+      lbl.textContent = `Jours concernés (${h.days.length} j / sem.)`;
+    });
+  });
+  wrap.querySelectorAll('.tm-date input').forEach(inp => {
+    inp.addEventListener('change', e => { const h=tmDraft.find(x=>x.id===inp.dataset.id); if(h) h.start = e.target.value || h.start; });
+  });
+  wrap.querySelectorAll('.tm-habit-del').forEach(btn => {
+    btn.addEventListener('click', () => confirmDeleteHabit(btn.dataset.del));
+  });
+}
+
+function renderTmAddGrid() {
+  const grid = document.getElementById('tm-add-grid');
+  const usedIds = new Set(tmDraft.map(h=>h.id));
+  const available = [];
+  TASK_LIBRARY.forEach(cat => cat.tasks.forEach(t => { if (!usedIds.has(t.id)) available.push(t); }));
+  if (!available.length) { grid.innerHTML = `<div class="empty-note" style="grid-column:1/-1">Toutes les habitudes de la librairie sont déjà suivies. 🎉</div>`; return; }
+  grid.innerHTML = available.map(t => `
+    <div class="task-chip" data-add="${t.id}">
+      <span class="tc-emoji">${t.emoji}</span>
+      <span class="tc-name">${t.name}</span>
+      <span class="tc-check">+</span>
+    </div>`).join('');
+  grid.querySelectorAll('.task-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const t = TASK_BY_ID[chip.dataset.add];
+      tmDraft.push({ id:t.id, name:t.name, emoji:t.emoji, color:PALETTE[tmDraft.length%PALETTE.length], days:[0,1,2,3,4], start:fmtISO(today()) });
+      renderTmList(); renderTmAddGrid();
+      document.querySelector('.modal-body').scrollTop = 0;
+    });
+  });
+}
+
+function confirmDeleteHabit(taskId) {
+  const h = tmDraft.find(x=>x.id===taskId); if (!h) return;
+  const isExisting = tmOriginalIds.includes(taskId);
+  const ov = document.createElement('div');
+  ov.className = 'modal-overlay'; ov.id = 'tm-confirm'; ov.style.zIndex = 340;
+  ov.innerHTML = `
+    <div class="modal-card tm-confirm-card">
+      <div class="tm-confirm-ico">⚠️</div>
+      <div class="tm-confirm-title">Supprimer « ${h.name} » ?</div>
+      <div class="tm-confirm-txt">Tu t'apprêtes à retirer <b>${h.emoji} ${h.name}</b> de ton suivi.</div>
+      ${isExisting ? `<div class="tm-confirm-highlight">⚠️ Tout l'historique de cette habitude sera <b>définitivement effacé</b>. Tu ne pourras plus assurer son suivi mensuel et annuel. Cette action est irréversible.</div>` : `<div class="tm-confirm-txt" style="color:var(--muted)">Cette habitude vient d'être ajoutée et n'a pas encore d'historique.</div>`}
+      <div class="tm-confirm-actions">
+        <button id="tmc-cancel" style="background:var(--card2);color:var(--text);border:1px solid var(--border)">Annuler</button>
+        <button id="tmc-del" style="background:var(--red);color:#fff">Supprimer définitivement</button>
+      </div>
+    </div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener('click', e => { if (e.target===ov) ov.remove(); });
+  document.getElementById('tmc-cancel').addEventListener('click', () => ov.remove());
+  document.getElementById('tmc-del').addEventListener('click', () => {
+    tmDraft = tmDraft.filter(x=>x.id!==taskId);
+    ov.remove(); renderTmList(); renderTmAddGrid();
+  });
+}
+
+async function saveTaskManager() {
+  // empêcher une habitude à 0 jour
+  const zero = tmDraft.find(h => !h.days.length);
+  if (zero) { alert(`« ${zero.name} » n'a aucun jour sélectionné. Choisis au moins un jour ou supprime l'habitude.`); return; }
+
+  const btn = document.getElementById('tm-save');
+  btn.disabled = true; const old = btn.textContent; btn.textContent = 'Enregistrement…';
+
+  const draftIds = tmDraft.map(h=>h.id);
+  const toDelete = tmOriginalIds.filter(id => !draftIds.includes(id));
+  const toAdd    = tmDraft.filter(h => !tmOriginalIds.includes(h.id));
+  const toUpdate = tmDraft.filter(h => tmOriginalIds.includes(h.id));
+
+  try {
+    for (const id of toDelete) await Store.deleteHabit(id);
+    for (const h of toAdd)     await Store.addHabit(h);
+    for (const h of toUpdate)  await Store.updateHabit(h);
+    // recharger l'état
+    const data = await Store.loadAll();
+    HABITS = (data.habits||[]).map(h => ({ ...h, _start: parseISO(h.start) }));
+    APP = { completions: data.completions || {}, habits: data.habits || [] };
+    closeTaskManager();
+    updateTopbar(); updateSidebarScore(); renderCurrentView();
+  } catch(e) {
+    btn.disabled = false; btn.textContent = old;
+    alert('Impossible d\'enregistrer les modifications : ' + e.message);
+  }
+}
+document.getElementById('open-tm-weekly').addEventListener('click', openTaskManager);
 
 /* ============================================================
    INIT
@@ -1910,14 +2542,11 @@ updateMobileNav();
   try {
     await initSupabase();
   } catch(e) {
-    // Réseau/SDK indisponible : on laisse l'écran de connexion,
-    // le bouton "démo" reste utilisable (100% local).
     const err = document.getElementById('login-err');
     if (err) err.textContent = 'Connexion au serveur impossible. Le mode démo reste disponible.';
     console.warn('Supabase non chargé :', e.message);
     return;
   }
-  // Auto-connexion si une session valide existe (et "rester connecté" actif)
   let noPersist = false;
   try { noPersist = sessionStorage.getItem('todogrowth_no_persist') === '1'; } catch(e){}
   const session = await Store.currentSession();
