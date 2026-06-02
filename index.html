@@ -284,6 +284,10 @@ canvas{display:block}
 
 /* ── TOOLTIP ─────────────────────────────────────────────── */
 #tooltip{position:fixed;pointer-events:none;z-index:1000;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:9px 13px;font-size:12.5px;font-family:var(--font);color:var(--text);box-shadow:var(--shadow);display:none;line-height:1.6}
+#tdg-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);z-index:9998;max-width:90vw;background:var(--card2);border:1px solid var(--border);border-left:4px solid var(--green);border-radius:12px;padding:13px 18px;font-size:13.5px;font-family:var(--font);color:var(--text);box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;line-height:1.5}
+#tdg-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#tdg-toast.error{border-left-color:var(--red)}
+@media(max-width:760px){#tdg-toast{bottom:calc(74px + env(safe-area-inset-bottom))}}
 
 /* ════════════════════════════════════════════════════════════
    WEEKLY SUMMARY MODAL
@@ -984,6 +988,19 @@ const Store = (() => {
   let demoMode = false;
   let demoData = null;   // { habits, completions, profile } pour la démo locale
 
+  /* Récupère l'utilisateur connecté de façon fiable. ✦ correctif :
+     on lit d'abord la session locale (getSession, sans aller-retour réseau
+     fragile), puis on bascule sur getUser en secours. Évite l'erreur
+     "Cannot read properties of null (reading 'id')". */
+  async function requireUser() {
+    if (!sb) throw new Error('Connexion au serveur impossible. Vérifie ta connexion internet.');
+    let user = null;
+    try { const { data:{ session } } = await sb.auth.getSession(); if (session && session.user) user = session.user; } catch(e){}
+    if (!user) { try { const { data:{ user:u } } = await sb.auth.getUser(); user = u || null; } catch(e){} }
+    if (!user) throw new Error('Ta session a expiré. Reconnecte-toi, puis réessaie.');
+    return user;
+  }
+
   /* générateur pseudo-aléatoire reproductible (données de démo) */
   function mulberry32(a){return function(){a|=0;a=(a+0x6d2b79f5)|0;let t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};}
   function seedCompletions(habits, rateMap) {
@@ -1078,7 +1095,7 @@ const Store = (() => {
         const p = demoData.profile;
         return { email:p.email, created_at:p.created_at, user_metadata:{ phone:p.phone, name:p.name } };
       }
-      const { data: { user } } = await sb.auth.getUser();
+      const user = await requireUser();
       return user;
     },
     /* met à jour les métadonnées (téléphone, nom) — ✦ nouveau */
@@ -1097,7 +1114,7 @@ const Store = (() => {
     /* --- DONNÉES (habits + completions) --- */
     async loadAll() {
       if (demoMode) return demoData;
-      const { data: { user } } = await sb.auth.getUser();
+      const user = await requireUser();
       if (!user) return { habits: [], completions: {} };
       const [{ data: habits, error: he }, { data: comps, error: ce }] = await Promise.all([
         sb.from('habits').select('*').order('created_at'),
@@ -1119,7 +1136,7 @@ const Store = (() => {
     /* Enregistre les habitudes choisies à l'onboarding */
     async saveNewHabits(habits) {
       if (demoMode) { demoData.habits = habits; return; }
-      const { data: { user } } = await sb.auth.getUser();
+      const user = await requireUser();
       const rows = habits.map(h => ({
         user_id: user.id, task_id: h.id, name: h.name, emoji: h.emoji,
         color: h.color, days: h.days, start_date: h.start,
@@ -1131,7 +1148,7 @@ const Store = (() => {
     /* Ajoute UNE habitude — ✦ nouveau */
     async addHabit(h) {
       if (demoMode) { demoData.habits.push(h); return; }
-      const { data: { user } } = await sb.auth.getUser();
+      const user = await requireUser();
       const { error } = await sb.from('habits').upsert(
         [{ user_id:user.id, task_id:h.id, name:h.name, emoji:h.emoji, color:h.color, days:h.days, start_date:h.start }],
         { onConflict:'user_id,task_id' });
@@ -1141,7 +1158,7 @@ const Store = (() => {
     /* Met à jour UNE habitude existante (jours / date / nom) — ✦ nouveau */
     async updateHabit(h) {
       if (demoMode) { const i=demoData.habits.findIndex(x=>x.id===h.id); if(i>=0) demoData.habits[i]={...demoData.habits[i],...h}; return; }
-      const { data: { user } } = await sb.auth.getUser();
+      const user = await requireUser();
       const { error } = await sb.from('habits')
         .update({ name:h.name, emoji:h.emoji, color:h.color, days:h.days, start_date:h.start })
         .eq('user_id', user.id).eq('task_id', h.id);
@@ -1159,7 +1176,7 @@ const Store = (() => {
         }
         return;
       }
-      const { data: { user } } = await sb.auth.getUser();
+      const user = await requireUser();
       await sb.from('completions').delete().eq('user_id', user.id).eq('task_id', taskId);
       const { error } = await sb.from('habits').delete().eq('user_id', user.id).eq('task_id', taskId);
       if (error) throw new Error(error.message);
@@ -1168,7 +1185,7 @@ const Store = (() => {
     /* Coche / décoche une tâche un jour donné */
     async setCompletion(iso, taskId, done) {
       if (demoMode) return; // la démo ne persiste rien
-      const { data: { user } } = await sb.auth.getUser();
+      const user = await requireUser();
       if (done) {
         await sb.from('completions').upsert(
           { user_id: user.id, task_id: taskId, completed_date: iso },
@@ -1545,7 +1562,8 @@ function renderWeekly() {
         const bg = done ? C.green : (isFuture ? 'var(--track)' : C.red);
         const check = done ? `<svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 7.5L6 10.5L11.5 4" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>` : '';
         const cls = 'gm-tile' + (isFuture?' future':'');
-        html += `<td class="gm-tile-cell"><button class="${cls}" style="background:${bg};${isFuture?'cursor:default':''}" data-iso="${fmtISO(d)}" data-hid="${h.id}">${check}</button></td>`;
+        const tip = isFuture ? '' : ' title="Cliquer pour cocher / décocher"';
+        html += `<td class="gm-tile-cell"><button class="${cls}"${tip} style="background:${bg};${isFuture?'cursor:default':''}" data-iso="${fmtISO(d)}" data-hid="${h.id}">${check}</button></td>`;
       }
     }
     html += '</tr>';
@@ -1773,7 +1791,30 @@ function toggleHabit(iso, habitId) {
   updateTopbar();
   updateSidebarScore();
   renderCurrentView();
-  Store.setCompletion(iso, habitId, nowDone).catch(err => console.warn('Sauvegarde:', err.message));
+
+  // ✦ La sauvegarde ne doit plus échouer en silence : si elle rate
+  //    (session expirée, réseau…), on annule le changement et on prévient.
+  Store.setCompletion(iso, habitId, nowDone).catch(err => {
+    // annule la modification locale (peu importe ce qui s'est passé entre-temps)
+    const a = APP.completions[iso] || (APP.completions[iso] = []);
+    const j = a.indexOf(habitId);
+    if (nowDone) { if (j >= 0) a.splice(j, 1); }   // on avait coché → on décoche
+    else { if (j < 0) a.push(habitId); }            // on avait décoché → on recoche
+    if (!a.length) delete APP.completions[iso];
+    updateTopbar(); updateSidebarScore(); renderCurrentView();
+    toast(err.message || "La modification n'a pas pu être enregistrée.", 'error');
+  });
+}
+
+/* Petit message éphémère (succès / erreur) */
+let _toastTimer = null;
+function toast(msg, type) {
+  let el = document.getElementById('tdg-toast');
+  if (!el) { el = document.createElement('div'); el.id = 'tdg-toast'; document.body.appendChild(el); }
+  el.textContent = msg;
+  el.className = 'show' + (type === 'error' ? ' error' : '');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => { el.className = ''; }, 4200);
 }
 
 /* ============================================================
