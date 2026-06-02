@@ -1187,13 +1187,15 @@ const Store = (() => {
       if (demoMode) return; // la démo ne persiste rien
       const user = await requireUser();
       if (done) {
-        await sb.from('completions').upsert(
+        const { error } = await sb.from('completions').upsert(
           { user_id: user.id, task_id: taskId, completed_date: iso },
-          { onConflict: 'user_id,task_id,completed_date' }
+          { onConflict: 'user_id,task_id,completed_date', ignoreDuplicates: true }
         );
+        if (error) throw new Error(traduireErreur(error.message));
       } else {
-        await sb.from('completions').delete()
+        const { error } = await sb.from('completions').delete()
           .eq('user_id', user.id).eq('task_id', taskId).eq('completed_date', iso);
+        if (error) throw new Error(traduireErreur(error.message));
       }
     },
   };
